@@ -4,25 +4,31 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.ts --watch ./src --ext ts",
+    "dev": "tsx src/index.ts --watch ./src --ext ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@llm-tools/embedjs": "^0.0.94",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "hnswlib-node": "^3.0.0",
     "nodemon": "^3.1.4",
     "pg": "^8.12.0",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "tsx": "^4.17.0",
+    "vectorDb": "link:@llm-tools/embedjs/vectorDb",
+    "vectordb": "^0.9.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^22.1.0",
     "@types/pg": "^8.11.6",
+    "embedjs": "link:@types/@llm-tools/embedjs",
     "typescript": "^5.2.2"
   }
 }
