@@ -42,4 +42,4 @@ Thumbs.db
 .nx/workspace-data
 
 # pnpm stuff
-pnpm-lock.yaml
+./pnpm-lock.yaml
