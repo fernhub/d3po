@@ -1,5 +1,10 @@
-import { Heading } from "@chakra-ui/react";
+import ChatContainer from "./ChatContainer";
+import FileUploadContainer from "./FileUploadContainer";
 
-export default function Body() {
-  return <Heading>Test</Heading>;
+interface BodyProps {
+  fileSelected: boolean;
+}
+
+export default function Body({ fileSelected }: BodyProps) {
+  return fileSelected ? <ChatContainer /> : <FileUploadContainer />;
 }
