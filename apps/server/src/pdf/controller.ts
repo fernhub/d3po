@@ -1,5 +1,4 @@
 import { type Request, type Response } from "express";
-import { query } from "../db/db";
 import {
   SIMPLE_MODELS,
   type RAGApplication,
@@ -11,12 +10,7 @@ import path from "path";
 
 var RAG: RAGApplication;
 
-async function getAll(req: Request, res: Response) {
-  const queryResult = await query("SELECT * FROM pdf", []);
-  res.status(201).send({
-    rows: queryResult.rowCount,
-  });
-}
+async function getAll(req: Request, res: Response) {}
 
 async function getRAGBuilder(req: Request, res: Response) {
   const ragApplication: RAGApplication = await new RAGApplicationBuilder()
