@@ -12,7 +12,7 @@ function Header() {
         Here to help you understand any document
       </GridItem>
       <GridItem colSpan={1} pr={20} textAlign="right" alignContent="center">
-        <HeaderUserInfo authenticated={true} />
+        <HeaderUserInfo authenticated={false} />
       </GridItem>
     </Grid>
   );
