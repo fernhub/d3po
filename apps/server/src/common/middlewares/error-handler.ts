@@ -1,7 +1,7 @@
 import { type Request, type Response, type NextFunction } from "express";
 import { z } from "zod";
-import { HttpError } from "../exceptions/HttpError";
-import { HttpStatus } from "../enums/http-status.enums";
+import { HttpStatus } from "shared/enums/http-status.enums";
+import { HttpError } from "shared/exceptions/HttpError";
 
 export function errorHandler(err: unknown, req: Request, res: Response, _next: NextFunction): void {
   console.log("error firing");
