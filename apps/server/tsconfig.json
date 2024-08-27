@@ -20,6 +20,6 @@
       "$/*": ["./src/*"]
     }
   },
-  "include": ["**/*.ts", ".eslintrc.cjs"],
+  "include": ["**/*.ts", ".eslintrc.cjs", "../../packages/shared/enums/http-status.enums.ts"],
   "exclude": ["node_modules"]
 }

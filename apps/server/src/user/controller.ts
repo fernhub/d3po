@@ -1,10 +1,10 @@
 import { newUserSchema, userSchema, type NewUser, type User } from "shared/schema/user";
-import { type Request, type Response, type NextFunction } from "express";
+import { type Request, type Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { dUser } from "$/db/dUser";
-import { HttpError } from "$/common/exceptions/HttpError";
-import { HttpStatus } from "$/common/enums/http-status.enums";
+import { HttpError } from "shared/exceptions/HttpError";
+import { HttpStatus } from "shared/enums/http-status.enums";
 
 // Generate JWT
 function generateToken(id: number) {
@@ -58,12 +58,15 @@ async function loginUser(req: Request, res: Response) {
     })
     .parse(req.body);
 
+  console.log(`locating ${email}, ${password}`);
   //fetch user
   const user = await dUser.findOne(email);
+  console.log("found user");
+  console.log(user);
 
   //if user doesn't exist with these credentials, respond with error
   if (!user) {
-    res.status(409).send({ msg: "email already exists" });
+    res.status(HttpStatus.FORBIDDEN).send({ msg: "invalid email or password" });
     return;
   }
 
@@ -76,7 +79,7 @@ async function loginUser(req: Request, res: Response) {
       token: generateToken(user.id),
     });
   } else {
-    res.status(409).send({ msg: "email already exists" });
+    res.status(HttpStatus.FORBIDDEN).send({ msg: "invalid email or password" });
   }
 }
 
