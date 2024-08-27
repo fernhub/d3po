@@ -25,3 +25,7 @@ body,
   min-width: 100% !important;
   width: 100% !important;
 }
+
+.login-error {
+  color: red;
+}

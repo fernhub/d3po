@@ -13,7 +13,9 @@ export const dUser = {
    */
   findOne: async function (email: string): Promise<User | undefined> {
     console.log("finding user: ", email);
+    // console.log(`SELECT * from users where email='${email}'`);
     const queryResult: QueryResult = await db.query(`SELECT * from users where email='${email}'`);
+    // console.log(queryResult);
     if (queryResult.rowCount === 0) {
       return undefined;
     } else {
