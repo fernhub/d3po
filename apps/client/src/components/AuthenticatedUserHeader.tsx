@@ -8,25 +8,25 @@ import {
   MenuItem,
   MenuList,
 } from "@chakra-ui/react";
+import { useAuth } from "../context/AuthContext";
 
-interface UserInfo {
-  userName: string;
-}
-
-export default function AuthenticatedUserHeader({ userName }: UserInfo) {
+export default function AuthenticatedUserHeader() {
+  const { user, logout } = useAuth();
   return (
     <Menu>
       <MenuButton as={Button} colorScheme="pink" rightIcon={<ChevronDownIcon />}>
-        {userName}
+        {user!.name}
       </MenuButton>
       <MenuList>
-        <MenuGroup title={userName}>
+        <MenuGroup title={user!.name}>
           <MenuItem>My Account</MenuItem>
           <MenuItem>Settings</MenuItem>
         </MenuGroup>
         <MenuDivider />
         <MenuGroup>
-          <MenuItem color="red">Logout</MenuItem>
+          <MenuItem color="red" onClick={logout}>
+            Logout
+          </MenuItem>
         </MenuGroup>
       </MenuList>
     </Menu>

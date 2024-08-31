@@ -1,6 +1,7 @@
 import express, { type Request, type Response, type Application } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import { pdfRouter } from "./pdf/router";
 import { userRouter } from "./user/router";
 import { globalMiddlewares } from "./common/middlewares";
@@ -13,9 +14,12 @@ const app: Application = express();
 app.use(
   cors({
     origin: "http://localhost:5173",
-    allowedHeaders: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
   })
 );
+
+app.use(cookieParser());
 
 app.use(express.json());
 
