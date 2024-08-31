@@ -1,14 +1,8 @@
 import LoginOrSignupUserHeader from "./LoginOrSignupUserHeader";
 import AuthenticatedUserHeader from "./AuthenticatedUserHeader";
+import { useAuth } from "../context/AuthContext";
 
-interface HeaderUserInfoProps {
-  authenticated: boolean;
-}
-
-export default function HeaderUserInfo({ authenticated }: HeaderUserInfoProps) {
-  return authenticated ? (
-    <AuthenticatedUserHeader userName="Zack Fernandez" />
-  ) : (
-    <LoginOrSignupUserHeader />
-  );
+export default function HeaderUserInfo() {
+  const { isLoggedIn } = useAuth();
+  return isLoggedIn ? <AuthenticatedUserHeader /> : <LoginOrSignupUserHeader />;
 }

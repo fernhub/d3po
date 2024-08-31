@@ -21,5 +21,6 @@
     }
   },
   "include": ["**/*.ts", ".eslintrc.cjs", "../../packages/shared/enums/http-status.enums.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "typeRoots": ["./node_module/@types", "./src/types"]
 }

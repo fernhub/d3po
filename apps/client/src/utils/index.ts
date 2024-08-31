@@ -1,5 +1,5 @@
 import { HttpError } from "shared/exceptions/HttpError";
-
+import { type UserInfo } from "shared/schema/user";
 type QueryResponse = {
   msg: string;
 };
@@ -8,6 +8,7 @@ export const api = {
   queryRag: async (queryString: string): Promise<QueryResponse> => {
     const res = await fetch("http://localhost:5001/pdfs/query", {
       method: "POST",
+      credentials: "include",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -16,18 +17,12 @@ export const api = {
         query: queryString,
       }),
     });
-    if (!res.ok) {
-      const json = await res.json();
-      throw new HttpError({
-        message: json.answer,
-        code: res.status,
-      });
-    }
     return checkResponseAndThrowError(res);
   },
-  handleLogin: async (email: string, password: string): Promise<QueryResponse> => {
+  handleLogin: async (email: string, password: string): Promise<UserInfo> => {
     const res = await fetch("http://localhost:5001/users/login", {
       method: "POST",
+      credentials: "include",
       headers: {
         Accept: "application/json",
         "Content-type": "application/json",
@@ -42,6 +37,7 @@ export const api = {
   handleSignup: async (email: string, name: string, password: string): Promise<QueryResponse> => {
     const res = await fetch("http://localhost:5001/users/login", {
       method: "POST",
+      credentials: "include",
       headers: {
         Accept: "application/json",
         "Content-type": "application/json",
@@ -54,11 +50,23 @@ export const api = {
     });
     return checkResponseAndThrowError(res);
   },
+  getCurrentUser: async (): Promise<UserInfo> => {
+    const res = await fetch("http://localhost:5001/users/me", {
+      credentials: "include",
+    });
+    return checkResponseAndThrowError(res);
+  },
+  handleLogout: async (): Promise<void> => {
+    const res = await fetch("http://localhost:5001/users/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+    checkResponseAndThrowError(res);
+  },
 };
 
 async function checkResponseAndThrowError(res: Response) {
   const json = await res.json();
-  console.log(json);
   if (!res.ok) {
     throw new HttpError({
       message: json.msg,
