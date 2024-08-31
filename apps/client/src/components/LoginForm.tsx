@@ -1,6 +1,6 @@
 import { FieldValues, useForm } from "react-hook-form";
 import { FormErrorMessage, FormLabel, FormControl, Input, Button } from "@chakra-ui/react";
-import { api } from "../utils";
+import { useAuth } from "../context/AuthContext.tsx";
 import { HttpError } from "shared/exceptions/HttpError";
 
 export default function LoginForm() {
@@ -10,11 +10,12 @@ export default function LoginForm() {
     setError,
     formState: { errors, isSubmitting },
   } = useForm();
+  const { login } = useAuth();
 
   async function onSubmit(values: FieldValues) {
+    console.log("submitting form");
     try {
-      const res = await api.handleLogin(values.email, values.password);
-      console.log(res);
+      await login(values.loginEmail, values.loginPassword);
     } catch (e) {
       if (e instanceof HttpError) {
         setError("root.serverError", {
@@ -29,25 +30,26 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <FormControl isInvalid={errors.email !== undefined || errors.password !== undefined}>
-        <FormLabel htmlFor="email">Email</FormLabel>
+      <FormControl
+        isInvalid={errors.loginEmail !== undefined || errors.loginPassword !== undefined}>
+        <FormLabel htmlFor="loginEmail">Email</FormLabel>
         <Input
-          id="email"
+          id="loginEmail"
           type="email"
           placeholder="email"
-          {...register("email", {
+          {...register("loginEmail", {
             required: "This is required",
           })}
         />
         <FormErrorMessage>
           <>{errors.email && errors.email.message}</>
         </FormErrorMessage>
-        <FormLabel htmlFor="password">Password</FormLabel>
+        <FormLabel htmlFor="loginPassword">Password</FormLabel>
         <Input
-          id="password"
+          id="loginPassword"
           type="password"
           placeholder="password"
-          {...register("password", {
+          {...register("loginPassword", {
             required: "This is required",
           })}
         />

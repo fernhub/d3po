@@ -8,11 +8,9 @@ function Header() {
       <GridItem pl={20} colSpan={1} alignContent="center">
         <Image src={logo} />
       </GridItem>
-      <GridItem colSpan={6} textAlign="center" alignContent="center">
-        Here to help you understand any document
-      </GridItem>
+      <GridItem colSpan={6} textAlign="center" alignContent="center"></GridItem>
       <GridItem colSpan={1} pr={20} textAlign="right" alignContent="center">
-        <HeaderUserInfo authenticated={false} />
+        <HeaderUserInfo />
       </GridItem>
     </Grid>
   );

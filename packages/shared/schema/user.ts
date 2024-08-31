@@ -1,4 +1,4 @@
-import { optional, z } from "zod";
+import { z } from "zod";
 
 export const newUserSchema = z.object({
   name: z
@@ -38,16 +38,14 @@ export const userSchema = z.object({
   password: z.string({
     required_error: "password is required",
   }),
-  token: z.string().optional(),
 });
 
-export const authenticatedUserSchema = z.object({
+export const userInfoSchema = z.object({
   id: z.number(),
   name: z.string(),
   email: z.string().email("Must be a valid email address"),
-  token: z.string(),
 });
 
 export type NewUser = z.infer<typeof newUserSchema>;
 export type User = z.infer<typeof userSchema>;
-export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
+export type UserInfo = z.infer<typeof userInfoSchema>;
