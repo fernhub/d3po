@@ -5,7 +5,6 @@ import {
   ModalCloseButton,
   ModalContent,
   ModalFooter,
-  ModalHeader,
   ModalOverlay,
   Tab,
   TabList,
@@ -20,7 +19,6 @@ import SignupForm from "./SignupForm";
 
 export default function LoginOrSignupUserHeader() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const isLogin = true;
 
   return (
     <>

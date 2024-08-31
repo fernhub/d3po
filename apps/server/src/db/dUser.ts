@@ -11,15 +11,33 @@ export const dUser = {
    * @param email
    * @returns User or undefined
    */
-  findOne: async function (email: string): Promise<User | undefined> {
+  findUserByEmail: async function (email: string): Promise<User | undefined> {
     console.log("finding user: ", email);
     // console.log(`SELECT * from users where email='${email}'`);
     const queryResult: QueryResult = await db.query(`SELECT * from users where email='${email}'`);
-    // console.log(queryResult);
+    console.log(queryResult);
     if (queryResult.rowCount === 0) {
       return undefined;
     } else {
       const user = queryResult.rows[0];
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        password: user.passhash,
+      };
+    }
+  },
+  findUserById: async function (id: string): Promise<User | undefined> {
+    console.log("finding user: ", id);
+    // console.log(`SELECT * from users where email='${email}'`);
+    const queryResult: QueryResult = await db.query(`SELECT * from users where id='${id}'`);
+    if (queryResult.rowCount === 0) {
+      console.log(`did not find user ${id}`);
+      return undefined;
+    } else {
+      const user = queryResult.rows[0];
+      console.log(`found user ${id}`);
       return {
         id: user.id,
         name: user.name,
