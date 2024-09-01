@@ -1,11 +1,11 @@
-import { Query, QueryResult } from "pg";
+import { QueryResult } from "pg";
 import { db } from "./db";
 import { type NewUser, type User } from "shared/schema/user";
 
 /**
  * Functions related to DB queries for Users table
  */
-export const dUser = {
+export const cUser = {
   /**
    * Select existing user from database, if none exist return undefined
    * @param email
@@ -15,7 +15,6 @@ export const dUser = {
     console.log("finding user: ", email);
     // console.log(`SELECT * from users where email='${email}'`);
     const queryResult: QueryResult = await db.query(`SELECT * from users where email='${email}'`);
-    console.log(queryResult);
     if (queryResult.rowCount === 0) {
       return undefined;
     } else {
@@ -31,7 +30,7 @@ export const dUser = {
   findUserById: async function (id: string): Promise<User | undefined> {
     console.log("finding user: ", id);
     // console.log(`SELECT * from users where email='${email}'`);
-    const queryResult: QueryResult = await db.query(`SELECT * from users where id='${id}'`);
+    const queryResult: QueryResult = await db.query(`SELECT * from users where user_id='${id}'`);
     if (queryResult.rowCount === 0) {
       console.log(`did not find user ${id}`);
       return undefined;
@@ -54,7 +53,7 @@ export const dUser = {
   createUser: async function (user: NewUser): Promise<User> {
     console.log("creating user: ", user.email);
     const queryResult: QueryResult = await db.query(
-      `INSERT INTO users (name, email, passhash) VALUES ('${user.name}', '${user.email}', '${user.password}') RETURNING id`
+      `INSERT INTO users (name, email, passhash) VALUES ('${user.name}', '${user.email}', '${user.password}') RETURNING user_id`
     );
     return {
       id: queryResult.rows[0].id,
