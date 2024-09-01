@@ -8,6 +8,7 @@ const AuthContext = createContext<AuthContextData>({
   user: null,
   isLoggedIn: false,
   login: async () => {},
+  signup: async () => {},
   logout: () => {},
 });
 
@@ -50,10 +51,19 @@ function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoggedIn(false);
   }
 
+  async function signup(name: string, email: string, password: string) {
+    const res = await api.handleSignup(name, email, password);
+    console.log("setting user");
+    console.log(res);
+    setUser(res);
+    setIsLoggedIn(true);
+  }
+
   return (
     <AuthContext.Provider
       value={{
         login,
+        signup,
         logout,
         user,
         isLoggedIn,

@@ -1,27 +1,18 @@
 import { FieldValues, useForm } from "react-hook-form";
 import { FormErrorMessage, FormLabel, FormControl, Input, Button } from "@chakra-ui/react";
-import { api } from "../utils";
+import { useAuth } from "../context/AuthContext";
 
-import { HttpError } from "shared/exceptions/HttpError";
-
-export default function SignupForm() {
+export default function RegisterForm() {
   const {
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
   } = useForm();
 
+  const { signup } = useAuth();
+
   async function onSubmit(values: FieldValues) {
-    try {
-      const res = await api.handleSignup(values.name, values.email, values.password);
-      console.log(res);
-    } catch (e) {
-      if (e instanceof HttpError) {
-        console.log(e);
-      } else {
-        console.log(e);
-      }
-    }
+    signup(values.name, values.email, values.password);
   }
 
   return (
@@ -71,6 +62,11 @@ export default function SignupForm() {
       <Button mt={4} colorScheme="green" isLoading={isSubmitting} type="submit">
         Create Account
       </Button>
+      <>
+        {errors.root && errors.root.serverError && (
+          <p className="login-error">Error: {errors.root.serverError.message}</p>
+        )}
+      </>
     </form>
   );
 }

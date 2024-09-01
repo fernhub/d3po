@@ -18,6 +18,8 @@ export default function LoginForm() {
       await login(values.loginEmail, values.loginPassword);
     } catch (e) {
       if (e instanceof HttpError) {
+        console.log(e.message);
+        console.log(e.code);
         setError("root.serverError", {
           type: "manual",
           message: e.message,
