@@ -14,7 +14,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import LoginForm from "./LoginForm";
-import SignupForm from "./SignupForm";
+import RegisterForm from "./RegisterForm";
 //import { api } from "../utils";
 
 export default function LoginOrSignupUserHeader() {
@@ -43,7 +43,7 @@ export default function LoginOrSignupUserHeader() {
               </TabPanel>
               <TabPanel>
                 <ModalBody>
-                  <SignupForm />
+                  <RegisterForm />
                 </ModalBody>
               </TabPanel>
             </TabPanels>

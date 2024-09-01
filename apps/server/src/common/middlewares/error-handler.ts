@@ -4,7 +4,6 @@ import { HttpError } from "shared/exceptions/HttpError";
 import { HttpStatus } from "shared/enums/http-status.enums";
 
 export function errorHandler(err: unknown, req: Request, res: Response, _next: NextFunction): void {
-  console.log("error firing");
   if (err instanceof z.ZodError) {
     res.status(HttpStatus.BAD_REQUEST).json({
       error: err.flatten(),
@@ -18,7 +17,7 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
     return;
   } else {
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      message: "Internal Server Error",
+      message: `Unknown error occured`,
     });
   }
 }
