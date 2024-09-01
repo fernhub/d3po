@@ -34,8 +34,8 @@ export const api = {
     });
     return checkResponseAndThrowError(res);
   },
-  handleSignup: async (email: string, name: string, password: string): Promise<QueryResponse> => {
-    const res = await fetch("http://localhost:5001/users/login", {
+  handleSignup: async (name: string, email: string, password: string): Promise<UserInfo> => {
+    const res = await fetch("http://localhost:5001/users/signup", {
       method: "POST",
       credentials: "include",
       headers: {
@@ -69,7 +69,7 @@ async function checkResponseAndThrowError(res: Response) {
   const json = await res.json();
   if (!res.ok) {
     throw new HttpError({
-      message: json.msg,
+      message: json.message,
       code: res.status,
     });
   }

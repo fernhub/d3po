@@ -24,7 +24,7 @@ export const newUserSchema = z.object({
 });
 
 export const userSchema = z.object({
-  id: z.number(),
+  id: z.string(),
   name: z
     .string({
       required_error: "user's name is required",

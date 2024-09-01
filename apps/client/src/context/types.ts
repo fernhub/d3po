@@ -4,5 +4,6 @@ export type AuthContextData = {
   user: UserInfo | null;
   isLoggedIn: boolean;
   login: (email: string, password: string) => void;
+  signup: (name: string, email: string, password: string) => void;
   logout: () => void;
 };

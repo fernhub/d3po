@@ -1,36 +1,51 @@
 import { newUserSchema, userSchema, type NewUser, type User } from "shared/schema/user";
-import { type Request, type Response } from "express";
+import { NextFunction, type Request, type Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { dUser } from "$/db/dUser";
+import { cUser } from "$/db/cUser";
 import { HttpError } from "shared/exceptions/HttpError";
 import { HttpStatus } from "shared/enums/http-status.enums";
 import dayjs from "dayjs";
+import { error } from "console";
 
 // Generate JWT
-function generateToken(userId: number) {
+function generateToken(userId: string) {
   return jwt.sign({ userId }, process.env.JWT_SECRET!, { expiresIn: "30d" });
 }
 
-async function registerUser(req: Request, res: Response) {
-  console.log("registering user");
+async function signupUser(req: Request, res: Response, next: NextFunction) {
+  console.log("creating user");
+
   // parse body from request
-  const data: NewUser = newUserSchema.parse(req.body);
+  const parse = newUserSchema.safeParse(req.body);
+  if (parse.error) {
+    next(parse.error);
+    return;
+  }
+  console.log("parsed ok");
+  const data = parse.data;
 
   console.log(data);
+  console.log("does user exist?");
 
-  const userExists = await dUser.findUserByEmail(data.email);
+  const userExists = await cUser.findUserByEmail(data.email);
   if (userExists) {
-    res.status(409).send({ msg: "email already exists" });
+    next(new HttpError({ message: "email already exists", code: HttpStatus.CONFLICT }));
+    return;
   }
+  console.log("no");
 
   // create hash password
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(data.password, salt);
 
+  console.log("pass hashed");
+
   try {
     //create user
-    const newUser: User = await dUser.createUser({
+    console.log("creating row");
+
+    const newUser: User = await cUser.createUser({
       name: data.name,
       email: data.email,
       password: hashedPassword,
@@ -38,39 +53,47 @@ async function registerUser(req: Request, res: Response) {
 
     //respond with jwt
     const authToken = generateToken(newUser.id);
-    res.cookie("authToken", JSON.stringify(authToken), {
+    res.cookie("authToken", authToken, {
       secure: process.env.NODE_ENV !== "development",
       httpOnly: true,
       expires: dayjs().add(30, "days").toDate(),
     });
-    res.status(201).send({
+    res.status(HttpStatus.CREATED).send({
       id: newUser.id,
       name: newUser.name,
       email: newUser.email,
     });
   } catch (e) {
-    throw new HttpError({
-      message: "Unable to create user",
-      code: HttpStatus.INTERNAL_SERVER_ERROR,
-    });
+    next(
+      new HttpError({
+        message: "Unable to create user",
+        code: HttpStatus.INTERNAL_SERVER_ERROR,
+      })
+    );
   }
 }
 
-async function loginUser(req: Request, res: Response) {
-  const { email, password } = userSchema
+async function loginUser(req: Request, res: Response, next: NextFunction) {
+  const parse = userSchema
     .omit({
       id: true,
       name: true,
     })
-    .parse(req.body);
+    .safeParse(req.body);
 
+  if (parse.error) {
+    next(parse.error);
+    return;
+  }
+
+  const { email, password } = parse.data;
   console.log(`locating ${email}, ${password}`);
   //fetch user
-  const user = await dUser.findUserByEmail(email);
+  const user = await cUser.findUserByEmail(email);
 
   //if user doesn't exist with these credentials, respond with error
   if (!user) {
-    res.status(HttpStatus.FORBIDDEN).send({ msg: "invalid email or password" });
+    next(new HttpError({ message: "invalid email or password", code: HttpStatus.CONFLICT }));
     return;
   }
 
@@ -82,13 +105,14 @@ async function loginUser(req: Request, res: Response) {
       httpOnly: true,
       expires: dayjs().add(30, "days").toDate(),
     });
-    res.status(200).send({
+    res.status(HttpStatus.OK).send({
       id: user.id,
       name: user.name,
       email: user.email,
     });
   } else {
-    res.status(HttpStatus.FORBIDDEN).send({ msg: "invalid email or password" });
+    next(new HttpError({ message: "invalid email or password", code: HttpStatus.FORBIDDEN }));
+    return;
   }
 }
 
@@ -97,7 +121,7 @@ async function loginUser(req: Request, res: Response) {
  * @param req
  * @param res
  */
-async function logoutUser(req: Request, res: Response) {
+async function logoutUser(req: Request, res: Response, next: NextFunction) {
   //add any logout logic here
   try {
     console.log(req.cookies.authToken);
@@ -107,9 +131,10 @@ async function logoutUser(req: Request, res: Response) {
     });
     console.log("cleared auth cookie");
     console.log(res.cookie);
-    res.status(200).send({ msg: "user logged out successfully" });
+    res.status(HttpStatus.OK).send({ msg: "user logged out successfully" });
   } catch (e) {
-    res.send(HttpStatus.INTERNAL_SERVER_ERROR).send({ msg: "unknown error occurred" });
+    next(e);
+    return;
   }
 }
 /**
@@ -117,26 +142,26 @@ async function logoutUser(req: Request, res: Response) {
  * @param req
  * @param res
  */
-async function getUserInfo(req: Request, res: Response) {
+async function getUserInfo(req: Request, res: Response, next: NextFunction) {
   console.log("getting user info");
   const userId = req.user;
   if (!userId) {
-    res.status(HttpStatus.NOT_FOUND).send({ msg: "User info not found" });
+    next(new HttpError({ message: "User info not found", code: HttpStatus.NOT_FOUND }));
   }
-  const user = await dUser.findUserById(userId);
+  const user = await cUser.findUserById(userId);
   if (user) {
-    res.status(200).send({
+    res.status(HttpStatus.OK).send({
       id: user.id,
       name: user.name,
       email: user.email,
     });
   } else {
-    res.status(HttpStatus.NOT_FOUND).send({ msg: "User info not found" });
+    next(new HttpError({ message: "User info not found", code: HttpStatus.NOT_FOUND }));
   }
 }
 
 export const userController = {
-  registerUser,
+  signupUser,
   loginUser,
   logoutUser,
   getUserInfo,
