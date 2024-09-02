@@ -1,5 +1,6 @@
 import { type UploadDocument, type Document } from "shared/schema/document";
 import { db } from "./db";
+import { QueryResult } from "pg";
 
 export const cDocument = {
   /**
@@ -7,13 +8,16 @@ export const cDocument = {
    * @param document
    * @returns
    */
-  uploadDocument: async function (document: UploadDocument): Promise<Document> {
-    const queryResult = await db.query(
-      `INSERT INTO documents (user_id, name, s3_name) VALUES (${document.user_id}, ${document.name}, ${document.s3_name}) RETURNING document_id`
+  createDocument: async function (document: UploadDocument): Promise<Document> {
+    const queryResult: QueryResult = await db.query(
+      `INSERT INTO documents (user_id, name, s3_key) VALUES ('${document.user_id}', '${document.name}', '${document.s3_key}') RETURNING id`
     );
+    if (queryResult.rowCount === 0) {
+      throw new Error(`Cannot create document row for user: ${document.user_id}`);
+    }
     return {
-      document_id: queryResult.rows[0].document_id,
       ...document,
+      document_id: queryResult.rows[0].id,
     };
   },
 };
