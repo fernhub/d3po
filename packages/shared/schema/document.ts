@@ -19,3 +19,8 @@ export const documentSchema = z.object({
   s3_name: z.string(),
 });
 export type Document = z.infer<typeof documentSchema>;
+
+export const documentUploadLinkSchema = z.object({
+  presignedUrl: z.string().url(),
+});
+export type DocumentUploadLink = z.infer<typeof documentUploadLinkSchema>;

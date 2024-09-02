@@ -10,23 +10,20 @@ import { error } from "console";
 
 // Generate JWT
 function generateToken(userId: string) {
+  console.log(userId);
   return jwt.sign({ userId }, process.env.JWT_SECRET!, { expiresIn: "30d" });
 }
 
 async function signupUser(req: Request, res: Response, next: NextFunction) {
-  console.log("creating user");
-
   // parse body from request
   const parse = newUserSchema.safeParse(req.body);
   if (parse.error) {
     next(parse.error);
     return;
   }
-  console.log("parsed ok");
   const data = parse.data;
 
   console.log(data);
-  console.log("does user exist?");
 
   const userExists = await cUser.findUserByEmail(data.email);
   if (userExists) {
@@ -54,7 +51,7 @@ async function signupUser(req: Request, res: Response, next: NextFunction) {
     //respond with jwt
     const authToken = generateToken(newUser.id);
     res.cookie("authToken", authToken, {
-      secure: process.env.NODE_ENV !== "development",
+      secure: false,
       httpOnly: true,
       expires: dayjs().add(30, "days").toDate(),
     });
@@ -87,7 +84,7 @@ async function loginUser(req: Request, res: Response, next: NextFunction) {
   }
 
   const { email, password } = parse.data;
-  console.log(`locating ${email}, ${password}`);
+
   //fetch user
   const user = await cUser.findUserByEmail(email);
 
@@ -98,10 +95,11 @@ async function loginUser(req: Request, res: Response, next: NextFunction) {
   }
 
   if (user && (await bcrypt.compare(password, user.password))) {
+    console.log(user);
+    console.log(`generating login token: ${user.id}`);
     const authToken = generateToken(user.id);
-    console.log(`setting auth token ${authToken}`);
     res.cookie("authToken", authToken, {
-      secure: process.env.NODE_ENV !== "development",
+      secure: false,
       httpOnly: true,
       expires: dayjs().add(30, "days").toDate(),
     });
@@ -124,13 +122,11 @@ async function loginUser(req: Request, res: Response, next: NextFunction) {
 async function logoutUser(req: Request, res: Response, next: NextFunction) {
   //add any logout logic here
   try {
-    console.log(req.cookies.authToken);
     res.cookie("authToken", "", {
       httpOnly: true,
       expires: dayjs().subtract(1, "days").toDate(),
     });
     console.log("cleared auth cookie");
-    console.log(res.cookie);
     res.status(HttpStatus.OK).send({ msg: "user logged out successfully" });
   } catch (e) {
     next(e);

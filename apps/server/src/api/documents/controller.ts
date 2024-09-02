@@ -1,9 +1,9 @@
 import { NextFunction, type Request, type Response } from "express";
-import { newDocumentSchema, UploadDocument, uploadDocumentSchema } from "shared/schema/document";
+import { type Document, newDocumentSchema } from "shared/schema/document";
 import bcrypt from "bcryptjs";
-import aws from "aws-sdk";
-import { HttpError } from "shared/exceptions/HttpError";
-import { HttpStatus } from "shared/enums/http-status.enums";
+import { S3Client, GetObjectCommand, S3ClientConfig, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { cDocument } from "$/db/cDocument";
 
 var fileExtRegex = /(?:\.([^.]+))?$/;
 
@@ -23,39 +23,59 @@ async function getDocumentKey(documentName: string) {
   return key;
 }
 
-async function getPresignedUploadLink(req: Request, res: Response, next: NextFunction) {
+async function getPresignedPutUrl(req: Request, res: Response, next: NextFunction) {
   const parse = newDocumentSchema.safeParse(req.body);
   if (parse.error) {
     next(parse.error);
     return;
   }
   const { name } = parse.data;
-  const _credentials = {
-    accessKeyId: process.env.S3_ACCESS_KEY!,
-    secretAccessKey: process.env.S3_SECRET_KEY!,
-  };
+  //create a hash of the raw doc name + user_id to ensure uniqueness
+  const key = await getDocumentKey(`${name}${req.user}`);
   try {
-    aws.config.update({ credentials: _credentials, region: process.env.region });
-    const s3 = new aws.S3();
-    const key = await getDocumentKey(name);
-    const signedUrl = s3.getSignedUrl("putObject", {
+    const s3Configuration: S3ClientConfig = {
+      credentials: {
+        accessKeyId: process.env.S3_ACCESS_KEY!,
+        secretAccessKey: process.env.S3_SECRET_KEY!,
+      },
+      region: process.env.S3_REGION,
+    };
+    const s3 = new S3Client(s3Configuration);
+    const command = new PutObjectCommand({
       Bucket: process.env.S3_BUCKET,
       Key: key,
-      Expires: 10,
     });
-
-    res.status(200).send({ signedUrl: signedUrl });
+    const url = await getSignedUrl(s3, command, { expiresIn: 15 * 60 }); // expires in seconds
+    console.log("Presigned URL: ", url);
+    res.status(200).send({ presignedUrl: url });
   } catch (err) {
     next(err);
     return;
   }
 }
 
-async function upload(req: Request, res: Response) {
-  const document: UploadDocument = uploadDocumentSchema.parse(req.body);
+async function createDocumentPointer(req: Request, res: Response, next: NextFunction) {
+  const parse = newDocumentSchema.safeParse(req.body);
+  if (parse.error) {
+    next(parse.error);
+    return;
+  }
+  const { name } = parse.data;
+  const key = await getDocumentKey(`${name}${req.user}`);
+  const newDocument: Document = await cDocument.createDocument({
+    name: name,
+    s3_key: key,
+    user_id: req.user,
+  });
+  res.status(201).send(newDocument);
+  try {
+  } catch (err) {
+    next(err);
+    return;
+  }
 }
 
 export const documentController = {
-  getPresignedUploadLink,
-  upload,
+  getPresignedPutUrl,
+  createDocumentPointer,
 };
