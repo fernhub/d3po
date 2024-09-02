@@ -1,3 +1,25 @@
 {
-  "exclude": ["node_modules"]
+  "ts-node": {
+    "esm": true,
+    "require": ["tsconfig-paths/register"],
+    "compilerOptions": {
+      "moduleResolution": "nodenext"
+    }
+  },
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "ES2022",
+    "outDir": "dist",
+    "strict": true,
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "$/*": ["./src/*"]
+    }
+  },
+  "include": ["**/*.ts", ".eslintrc.cjs", "../../packages/shared/enums/http-status.enums.ts"],
+  "exclude": ["node_modules"],
+  "typeRoots": ["./node_module/@types", "./src/types"]
 }

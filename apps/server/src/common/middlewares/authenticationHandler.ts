@@ -8,19 +8,21 @@ interface JwtPayload {
 }
 
 export function authenticationHandler(req: Request, res: Response, next: NextFunction) {
-  console.log(req.cookies);
+  console.log("Authenticating request");
   const token = req.cookies.authToken;
   if (!token) {
+    console.log(req.cookies);
+    console.log("no cookie found");
     return res.status(401).json({ error: "Access denied" });
   }
   console.log("token exists, decoding");
+  console.log(token);
   const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-  console.log(`decoded`);
   if (!decoded.userId) {
-    console.log("throwing error from inside auth handler");
+    console.log("userid not decoded from jwt");
     throw new HttpError({ message: "access denied", code: HttpStatus.UNAUTHORIZED });
   }
   req.user = decoded.userId;
-  console.log("going to next");
+  console.log("authentication passed");
   next();
 }
