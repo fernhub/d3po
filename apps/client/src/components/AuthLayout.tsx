@@ -16,13 +16,13 @@ export default function AuthLayout() {
       <GridItem rowSpan={2} colSpan={10} pl="2" pt="2">
         <Header />
       </GridItem>
-      <GridItem rowSpan={16} colSpan={2} pl="2" bg="pink.300">
+      <GridItem rowSpan={17} colSpan={2} pl="2" bg="pink.300">
         <Sidebar />
       </GridItem>
-      <GridItem rowSpan={16} colSpan={8} bg="green.300">
-        <Body fileSelected={true} />
+      <GridItem rowSpan={17} colSpan={8} bg="green.300">
+        <Body fileSelected={false} />
       </GridItem>
-      <GridItem pl="2" rowSpan={2} colSpan={10} bg="blue.300">
+      <GridItem pl="2" rowSpan={1} colSpan={10} bg="blue.300">
         <Footer />
       </GridItem>
     </Grid>

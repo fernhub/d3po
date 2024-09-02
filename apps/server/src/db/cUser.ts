@@ -30,7 +30,7 @@ export const cUser = {
   findUserById: async function (id: string): Promise<User | undefined> {
     console.log("finding user: ", id);
     // console.log(`SELECT * from users where email='${email}'`);
-    const queryResult: QueryResult = await db.query(`SELECT * from users where user_id='${id}'`);
+    const queryResult: QueryResult = await db.query(`SELECT * from users where id='${id}'`);
     if (queryResult.rowCount === 0) {
       console.log(`did not find user ${id}`);
       return undefined;
@@ -53,7 +53,7 @@ export const cUser = {
   createUser: async function (user: NewUser): Promise<User> {
     console.log("creating user: ", user.email);
     const queryResult: QueryResult = await db.query(
-      `INSERT INTO users (name, email, passhash) VALUES ('${user.name}', '${user.email}', '${user.password}') RETURNING user_id`
+      `INSERT INTO users (name, email, passhash) VALUES ('${user.name}', '${user.email}', '${user.password}') RETURNING id`
     );
     return {
       id: queryResult.rows[0].id,
