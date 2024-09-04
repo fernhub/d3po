@@ -2,12 +2,12 @@ html,
 body,
 #root,
 .css-9im5hd {
-  height: 100vh !important;
+  height: 100% !important;
   min-height: 100% !important;
 }
 
 .layout {
-  height: 100vh !important;
+  height: 100% !important;
   min-height: 100% !important;
 }
 
@@ -40,4 +40,30 @@ body,
   margin-top: 20%;
   text-align: center;
   align-items: center;
+}
+
+.sidebar {
+  padding-top: 5%;
+  padding-right: 2%;
+  padding-left: 2%;
+  padding-bottom: 5%;
+}
+
+#document-container-header {
+  margin-bottom: 5%;
+  padding-left: 2%;
+}
+
+#add-document-button,
+#refresh-documents-button {
+  float: right;
+  margin-right: 3%;
+}
+
+.document-tile {
+  margin-bottom: 5%;
+}
+
+.open-document-button {
+  float: right;
 }

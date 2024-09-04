@@ -1,29 +1,31 @@
 import { NextFunction, type Request, type Response } from "express";
-import { type Document, newDocumentSchema } from "shared/schema/document";
+import {
+  type Document,
+  newDocumentSchema,
+  type UpdateDocument,
+  updateDocumentRequestSchema,
+} from "shared/schema/document";
 import bcrypt from "bcryptjs";
+import { v4 as uuidv4 } from "uuid";
 import { S3Client, GetObjectCommand, S3ClientConfig, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { cDocument } from "$/db/cDocument";
-
-var fileExtRegex = /(?:\.([^.]+))?$/;
+import { DOCUMENT_STATUS } from "shared/enums/document";
 
 /**
  * Create a hashed key, with the original file extension, for upload to s3 so that names are hidden and unique in bucket
  * @param documentName - original documentName
  * @returns
  */
-async function getDocumentKey(documentName: string) {
-  const ext = fileExtRegex.exec(documentName);
-
+async function _getDocumentKey(key: string) {
   const salt = await bcrypt.genSalt(10);
-  const hashedName = await bcrypt.hash(documentName, salt);
+  const hashedKey = await bcrypt.hash(key, salt);
 
-  const key = `${hashedName}.${ext}`;
-  console.log(`creating key: ${key}`);
-  return key;
+  console.log(`creating key: ${hashedKey}`);
+  return hashedKey;
 }
 
-async function getPresignedPutUrl(req: Request, res: Response, next: NextFunction) {
+async function beginUpload(req: Request, res: Response, next: NextFunction) {
   const parse = newDocumentSchema.safeParse(req.body);
   if (parse.error) {
     next(parse.error);
@@ -31,7 +33,7 @@ async function getPresignedPutUrl(req: Request, res: Response, next: NextFunctio
   }
   const { name } = parse.data;
   //create a hash of the raw doc name + user_id to ensure uniqueness
-  const key = await getDocumentKey(`${name}${req.user}`);
+  const key = await _getDocumentKey(`${uuidv4()}${req.user}`);
   try {
     const s3Configuration: S3ClientConfig = {
       credentials: {
@@ -45,37 +47,56 @@ async function getPresignedPutUrl(req: Request, res: Response, next: NextFunctio
       Bucket: process.env.S3_BUCKET,
       Key: key,
     });
-    const url = await getSignedUrl(s3, command, { expiresIn: 15 * 60 }); // expires in seconds
+
+    await cDocument.createDocument({
+      name: name,
+      user_id: req.user,
+      s3_key: key,
+      status: DOCUMENT_STATUS.PROCESSING,
+    });
+
+    const url = await getSignedUrl(s3, command, { expiresIn: 5 }); // expires in seconds
     console.log("Presigned URL: ", url);
-    res.status(200).send({ presignedUrl: url });
+    res.status(200).send({ presignedUrl: url, s3_key: key });
   } catch (err) {
     next(err);
     return;
   }
 }
 
-async function createDocumentPointer(req: Request, res: Response, next: NextFunction) {
-  const parse = newDocumentSchema.safeParse(req.body);
+async function updateDocument(req: Request, res: Response, next: NextFunction) {
+  const parse = updateDocumentRequestSchema.safeParse(req.body);
   if (parse.error) {
     next(parse.error);
     return;
   }
-  const { name } = parse.data;
-  const key = await getDocumentKey(`${name}${req.user}`);
-  const newDocument: Document = await cDocument.createDocument({
-    name: name,
-    s3_key: key,
-    user_id: req.user,
-  });
-  res.status(201).send(newDocument);
+  const { s3_key, status } = parse.data;
   try {
-  } catch (err) {
-    next(err);
+    const updateDocRes: UpdateDocument = await cDocument.updateDocument({
+      user_id: req.user,
+      s3_key: s3_key,
+      status: status,
+    });
+    res.status(201).send(updateDocRes);
+  } catch (e) {
+    next(e);
+    return;
+  }
+}
+
+async function getAll(req: Request, res: Response, next: NextFunction) {
+  try {
+    const user_id = req.user;
+    const documents = await cDocument.getAll(user_id);
+    res.status(200).send(documents);
+  } catch (e) {
+    next(e);
     return;
   }
 }
 
 export const documentController = {
-  getPresignedPutUrl,
-  createDocumentPointer,
+  beginUpload,
+  updateDocument,
+  getAll,
 };

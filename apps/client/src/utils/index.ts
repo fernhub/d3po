@@ -1,6 +1,5 @@
 import { HttpError } from "shared/exceptions/HttpError";
 import { type UserInfo } from "shared/schema/user";
-import { DocumentUploadLink } from "shared/schema/document";
 
 type QueryResponse = {
   msg: string;
@@ -64,24 +63,6 @@ export const api = {
       credentials: "include",
     });
     checkResponseAndThrowError(res);
-  },
-  getPresignedPutUrl: async (file: File): Promise<DocumentUploadLink> => {
-    if (file.size > 5000000) {
-      throw new Error("File too large, 5MB upload limit");
-    }
-    console.log("sending request");
-    const res = await fetch("http://localhost:5001/documents/presignedPutUrl", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify({
-        name: file.name,
-      }),
-    });
-    return checkResponseAndThrowError(res);
   },
   checkResponseAndThrowError,
 };

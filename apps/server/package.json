@@ -28,6 +28,7 @@
     "shared": "workspace:*",
     "ts-node": "^10.9.2",
     "tsx": "^4.17.0",
+    "uuid": "^10.0.0",
     "vectorDb": "link:@llm-tools/embedjs/vectorDb",
     "vectordb": "^0.9.0"
   },
@@ -40,6 +41,7 @@
     "@types/multer": "^1.4.12",
     "@types/node": "^22.1.0",
     "@types/pg": "^8.11.6",
+    "@types/uuid": "^10.0.0",
     "embedjs": "link:@types/@llm-tools/embedjs",
     "typescript": "^5.2.2",
     "zod": "^3.23.8"
