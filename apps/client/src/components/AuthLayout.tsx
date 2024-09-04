@@ -16,7 +16,7 @@ export default function AuthLayout() {
       <GridItem rowSpan={2} colSpan={10} pl="2" pt="2">
         <Header />
       </GridItem>
-      <GridItem rowSpan={17} colSpan={2} pl="2" bg="pink.300">
+      <GridItem rowSpan={17} colSpan={2} bg="pink.300" className="sidebar">
         <Sidebar />
       </GridItem>
       <GridItem rowSpan={17} colSpan={8} bg="green.300">

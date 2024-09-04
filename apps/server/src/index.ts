@@ -1,5 +1,4 @@
 import express, { type Request, type Response, type Application } from "express";
-import multer from "multer";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";

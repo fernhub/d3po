@@ -17,7 +17,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserInfo | null>(null);
 
   useEffect(() => {
-    const fetchUserState = async () => {
+    async function fetchUserState() {
       console.log("fetching current user");
       try {
         const user = await api.getCurrentUser();
@@ -32,7 +32,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
           console.log("no current user session");
         }
       }
-    };
+    }
 
     fetchUserState();
   }, []);
