@@ -1,3 +1,9 @@
+import { DocumentsContainer } from "./DocumentsContainer";
+
 export default function Sidebar() {
-  return <>Sidebar</>;
+  return (
+    <>
+      <DocumentsContainer />
+    </>
+  );
 }
