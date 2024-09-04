@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { fileUploadUtils } from "../utils/fileUploadUtils";
+import { documentApi } from "../utils/documentUtils";
 
 export default function FileUploadContainer() {
   const [file, setFile] = useState<File>();
@@ -18,7 +18,7 @@ export default function FileUploadContainer() {
     if (file === undefined) {
       throw new Error("File not defined, cannot upload");
     }
-    await fileUploadUtils.uploadFileToS3(file);
+    await documentApi.uploadNewFile(file);
   }
   return (
     <div className="App">
