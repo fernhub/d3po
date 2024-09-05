@@ -1,6 +1,6 @@
 import { DOCUMENT_STATUS } from "shared/enums/document";
 import { api } from ".";
-import { type BeginDocumentUpload, type Document } from "shared/schema/document";
+import { type DocumentSignedUrl, type Document } from "shared/schema/document";
 
 export const documentApi = {
   uploadNewFile: async function (file: File) {
@@ -21,9 +21,27 @@ export const documentApi = {
     });
     return await api.checkResponseAndThrowError(res);
   },
+  deleteFile: async function (s3_key: string) {
+    console.log("deleting");
+    const res = await fetch("http://localhost:5001/documents/", {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        s3_key: s3_key,
+      }),
+    });
+    if (!res.ok) {
+      //TODO: gotta mark our document in db as error
+      throw Error("Error posting to s3");
+    }
+  },
 };
 
-async function getPresignedPutUrl(file: File): Promise<BeginDocumentUpload> {
+async function getPresignedPutUrl(file: File): Promise<DocumentSignedUrl> {
   if (file.size > 5000000) {
     throw new Error("File too large, 5MB upload limit");
   }
@@ -47,7 +65,7 @@ async function getPresignedPutUrl(file: File): Promise<BeginDocumentUpload> {
  * Sends file to db, which creates a row for 'processing', and generates presigned url for sending to s3
  * @param file
  */
-async function beginDocumentUpload(file: File): Promise<BeginDocumentUpload> {
+async function beginDocumentUpload(file: File): Promise<DocumentSignedUrl> {
   return await getPresignedPutUrl(file);
 }
 
@@ -62,6 +80,7 @@ async function uploadFileToS3PresignedUrl(file: File, presignedPutUrl: string) {
     body: file,
   });
   if (!res.ok) {
+    //TODO: gotta mark our document in db as error
     throw Error("Error posting to s3");
   }
 }
@@ -77,7 +96,7 @@ async function markUploadComplete(s3_key: string) {
     throw new Error("File not defined, cannot upload");
   }
   const res = await fetch("http://localhost:5001/documents/updateDocument", {
-    method: "POST",
+    method: "PUT",
     credentials: "include",
     headers: {
       Accept: "application/json",

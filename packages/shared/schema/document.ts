@@ -36,8 +36,13 @@ export const documentSchema = z.object({
 });
 export type Document = z.infer<typeof documentSchema>;
 
-export const beginDocumentUploadSchema = z.object({
+export const documentSignedUrlSchema = z.object({
   presignedUrl: z.string().url(),
   s3_key: z.string(),
 });
-export type BeginDocumentUpload = z.infer<typeof beginDocumentUploadSchema>;
+export type DocumentSignedUrl = z.infer<typeof documentSignedUrlSchema>;
+
+export const deleteDocumentSchema = z.object({
+  s3_key: z.string(),
+});
+export type DeleteDocument = z.infer<typeof deleteDocumentSchema>;

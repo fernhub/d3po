@@ -20,7 +20,12 @@
       "$/*": ["./src/*"]
     }
   },
-  "include": ["**/*.ts", ".eslintrc.cjs", "../../packages/shared/enums/http-status.enums.ts"],
+  "include": [
+    "**/*.ts",
+    ".eslintrc.cjs",
+    "../../packages/shared/enums/http-status.enums.ts",
+    "../../packages/shared/enums/document.ts"
+  ],
   "exclude": ["node_modules"],
   "typeRoots": ["./node_module/@types", "./src/types"]
 }
