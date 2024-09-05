@@ -47,4 +47,12 @@ export const cDocument = {
     );
     return queryResult.rows;
   },
+  deleteDocument: async function (s3_key: string, user_id: string) {
+    const queryResult: QueryResult = await db.query(`DELETE
+      FROM documents
+      WHERE user_id='${user_id}' AND s3_key='${s3_key}'`);
+    if (queryResult.rowCount !== 1) {
+      throw new Error("Error deleting document");
+    }
+  },
 };

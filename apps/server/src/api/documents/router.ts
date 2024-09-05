@@ -4,7 +4,10 @@ import { documentController } from "./controller";
 
 const router = express.Router();
 
-router.route("/").get(globalMiddlewares.authenticationHandler, documentController.getAll);
+router
+  .route("/")
+  .get(globalMiddlewares.authenticationHandler, documentController.getAll)
+  .delete(globalMiddlewares.authenticationHandler, documentController.deleteDocument);
 
 router
   .route("/beginUpload")
@@ -12,6 +15,6 @@ router
 
 router
   .route("/updateDocument")
-  .post(globalMiddlewares.authenticationHandler, documentController.updateDocument);
+  .put(globalMiddlewares.authenticationHandler, documentController.updateDocument);
 
 export const documentRouter = Object.assign(router, { ROOT: "/documents" });

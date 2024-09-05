@@ -1,5 +1,6 @@
 import { NextFunction, type Request, type Response } from "express";
 import {
+  deleteDocumentSchema,
   type Document,
   newDocumentSchema,
   type UpdateDocument,
@@ -7,10 +8,18 @@ import {
 } from "shared/schema/document";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
-import { S3Client, GetObjectCommand, S3ClientConfig, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  GetObjectCommand,
+  S3ClientConfig,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { cDocument } from "$/db/cDocument";
 import { DOCUMENT_STATUS } from "shared/enums/document";
+import { HttpStatus } from "shared/enums/http-status.enums";
+import { HttpError } from "shared/exceptions/HttpError";
 
 /**
  * Create a hashed key, with the original file extension, for upload to s3 so that names are hidden and unique in bucket
@@ -95,8 +104,71 @@ async function getAll(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+async function deleteDocument(req: Request, res: Response, next: NextFunction) {
+  console.log("in delete");
+  const parse = deleteDocumentSchema.safeParse(req.body);
+  if (parse.error) {
+    next(parse.error);
+    return;
+  }
+  const { s3_key } = parse.data;
+  console.log(`key: ${s3_key}`);
+
+  try {
+    const user_id = req.user;
+    console.log(`user: ${user_id}`);
+
+    const s3Configuration: S3ClientConfig = {
+      credentials: {
+        accessKeyId: process.env.S3_ACCESS_KEY!,
+        secretAccessKey: process.env.S3_SECRET_KEY!,
+      },
+      region: process.env.S3_REGION,
+    };
+    const s3 = new S3Client(s3Configuration);
+    const command = new DeleteObjectCommand({
+      Bucket: process.env.S3_BUCKET,
+      Key: s3_key,
+    });
+
+    const url = await getSignedUrl(s3, command, { expiresIn: 1 });
+    console.log(`signed url: ${url}`);
+
+    console.log("begin deleting");
+    await cDocument.updateDocument({
+      user_id: user_id,
+      s3_key: s3_key,
+      status: DOCUMENT_STATUS.DELETING,
+    });
+    const deleteFromS3 = await fetch(url, {
+      method: "DELETE",
+    });
+    if (!deleteFromS3.ok) {
+      console.log("s3 delete error");
+      console.log(deleteFromS3);
+      console.log("resetting document status");
+      await cDocument.updateDocument({
+        user_id: user_id,
+        s3_key: s3_key,
+        status: DOCUMENT_STATUS.UPLOADED,
+      });
+      throw new HttpError({
+        code: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: "Error deleting from S3",
+      });
+    }
+    console.log("finalizing delete");
+    await cDocument.deleteDocument(s3_key, user_id);
+    res.status(200).send();
+  } catch (e) {
+    next(e);
+    return;
+  }
+}
+
 export const documentController = {
   beginUpload,
   updateDocument,
   getAll,
+  deleteDocument,
 };
