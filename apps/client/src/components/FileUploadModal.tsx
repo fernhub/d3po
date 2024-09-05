@@ -10,6 +10,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Spinner,
   useToast,
 } from "@chakra-ui/react";
 
@@ -20,6 +21,7 @@ type FileModalProps = {
 
 export function FileUploadModal({ isOpen, onClose }: FileModalProps) {
   const [file, setFile] = useState<File>();
+  const [uploading, setUploading] = useState(false);
   const [, setDocuments] = useAtom(documentsAtom);
   const toast = useToast();
 
@@ -36,23 +38,32 @@ export function FileUploadModal({ isOpen, onClose }: FileModalProps) {
     if (file === undefined) {
       throw new Error("File not defined, cannot upload");
     }
-    onClose();
 
     const uploadNewFilePromise = documentApi.uploadNewFile(file);
-    toast.promise(uploadNewFilePromise, {
-      success: {
-        title: "Upload successful",
-        description: "Looks great",
-        position: "top",
-        isClosable: true,
-      },
-      error: { title: "Uh oh", description: "Something wrong", position: "top", isClosable: true },
-      loading: { title: "Uploading document", description: "Please wait", position: "top" },
-    });
-    uploadNewFilePromise.then(async () => {
-      const docs = await documentApi.getAll();
-      setDocuments(docs);
-    });
+    setUploading(true);
+    uploadNewFilePromise
+      .then(async () => {
+        const docs = await documentApi.getAll();
+        toast({
+          title: "Upload successful",
+          description: "Looks great",
+          position: "top",
+          status: "success",
+          isClosable: true,
+        });
+        setUploading(false);
+        onClose();
+        setDocuments(docs);
+      })
+      .catch(() => {
+        toast({
+          title: "Unable to upload",
+          description: "There was an error uploading this file. Please retry",
+          position: "top",
+          status: "error",
+          isClosable: true,
+        });
+      });
   }
 
   return (
@@ -61,15 +72,16 @@ export function FileUploadModal({ isOpen, onClose }: FileModalProps) {
       <ModalContent>
         <ModalHeader>Upload new file</ModalHeader>
         <ModalBody>
-          <input type="file" onChange={handleFileChange} />
+          <input type="file" onChange={handleFileChange} aria-disabled={uploading} />
         </ModalBody>
 
         <ModalFooter>
-          <Button id="" colorScheme="red" mr={3} onClick={onClose}>
+          <Button id="" colorScheme="red" mr={3} onClick={onClose} hidden={uploading}>
             Cancel
           </Button>
-          <Button colorScheme="green" onClick={uploadFile}>
-            Upload
+          <Button colorScheme="green" onClick={uploadFile} aria-disabled={uploading}>
+            {uploading ? "Uploading" : "Upload"}
+            <Spinner className="file-action-processing-spinner" hidden={!uploading} />
           </Button>
         </ModalFooter>
       </ModalContent>
