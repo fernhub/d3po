@@ -1,7 +1,7 @@
 import { DeleteIcon } from "@chakra-ui/icons";
 import { Card, CardBody, Text, IconButton, HStack, useDisclosure } from "@chakra-ui/react";
 import { type Document } from "shared/schema/document";
-import { DeleteModal } from "./DeleteModal";
+import { FileDeleteModal } from "./FileDeleteModal";
 type TileProps = {
   document: Document;
 };
@@ -29,7 +29,7 @@ export function DocumentTile({ document }: TileProps) {
           </HStack>
         </CardBody>
       </Card>
-      <DeleteModal isOpen={isOpen} onClose={onClose} s3_key={document.s3_key} />
+      <FileDeleteModal isOpen={isOpen} onClose={onClose} s3_key={document.s3_key} />
     </>
   );
 }

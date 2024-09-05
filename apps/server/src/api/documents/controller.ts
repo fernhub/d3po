@@ -131,7 +131,7 @@ async function deleteDocument(req: Request, res: Response, next: NextFunction) {
       Key: s3_key,
     });
 
-    const url = await getSignedUrl(s3, command, { expiresIn: 1 });
+    const url = await getSignedUrl(s3, command, { expiresIn: 5 });
     console.log(`signed url: ${url}`);
 
     console.log("begin deleting");
