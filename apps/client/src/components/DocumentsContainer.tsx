@@ -1,53 +1,39 @@
-import { useEffect, useState } from "react";
-import { documentApi } from "../utils/documentUtils";
 import { type Document } from "shared/schema/document";
-import { List, ListItem, Tooltip } from "@chakra-ui/react";
+import { Button, List, ListItem, useDisclosure } from "@chakra-ui/react";
 import { DocumentTile } from "./DocumentTile";
-import { AddIcon, RepeatIcon } from "@chakra-ui/icons";
+import { DocumentsContainerHeader } from "./DocumentsContainerHeader";
+import { FileUploadModal } from "./FileUploadModal";
+import { documentsAtom } from "../state/documents";
+import { useAtom } from "jotai";
 
 export function DocumentsContainer() {
-  const [documents, setDocuments] = useState<Document[]>([]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
-  useEffect(() => {
-    console.log("rendering DocumentsContainer");
-    const getDocuments = async () => {
-      const d: Document[] = await documentApi.getAll();
-      console.log(d);
-      setDocuments(d);
-    };
-    getDocuments();
-  }, []);
+  const [documents] = useAtom(documentsAtom);
 
   function renderDocumentList() {
-    if (documents.length === 0) {
-      return <div>Upload documents to see them here and begin interacting</div>;
-    } else {
-      return documents.map((document: Document) => {
-        return (
-          <ListItem>
-            <DocumentTile document={document} />
-          </ListItem>
-        );
-      });
-    }
+    return documents.map((document: Document) => {
+      return (
+        <ListItem key={document.s3_key}>
+          <DocumentTile document={document} key={document.s3_key} />
+        </ListItem>
+      );
+    });
   }
 
   return (
     <>
-      <div id="document-container-header">
-        <span>My documents</span>
-        <Tooltip label="Refresh documents">
-          <button id="refresh-documents-button">
-            <RepeatIcon />
-          </button>
-        </Tooltip>
-        <Tooltip label="Upload new document">
-          <button id="add-document-button">
-            <AddIcon />
-          </button>
-        </Tooltip>
-      </div>
-      <List>{renderDocumentList()}</List>
+      <DocumentsContainerHeader />
+      {documents.length === 0 ? (
+        <div className="new-document-button">
+          <Button onClick={onOpen} colorScheme="gray">
+            Upload New Document
+          </Button>
+          <FileUploadModal isOpen={isOpen} onClose={onClose} />
+        </div>
+      ) : (
+        <List>{renderDocumentList()}</List>
+      )}
     </>
   );
 }
