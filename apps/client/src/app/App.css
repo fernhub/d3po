@@ -73,3 +73,7 @@ body,
   content: center;
   vertical-align: center;
 }
+
+.file-action-processing-spinner {
+  margin-left: 2%;
+}
