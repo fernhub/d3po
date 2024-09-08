@@ -1,6 +1,5 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import "./App.css";
-import { StrictMode } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "../context/AuthContext";
 import { Provider } from "jotai";
@@ -15,15 +14,13 @@ function App() {
   ]);
 
   return (
-    <StrictMode>
-      <Provider>
-        <ChakraProvider>
-          <AuthProvider>
-            <RouterProvider router={router} />
-          </AuthProvider>
-        </ChakraProvider>
-      </Provider>
-    </StrictMode>
+    <Provider>
+      <ChakraProvider>
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </ChakraProvider>
+    </Provider>
   );
 }
 

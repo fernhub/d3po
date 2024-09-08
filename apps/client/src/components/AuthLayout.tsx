@@ -1,5 +1,5 @@
 import { Grid, GridItem } from "@chakra-ui/react";
-import Body from "./Body";
+import ChatContainer from "./ChatContainer";
 import Footer from "./Footer";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
@@ -20,7 +20,7 @@ export default function AuthLayout() {
         <Sidebar />
       </GridItem>
       <GridItem rowSpan={17} colSpan={8} bg="green.300">
-        <Body fileSelected={false} />
+        <ChatContainer />
       </GridItem>
       <GridItem pl="2" rowSpan={1} colSpan={10} bg="blue.300">
         <Footer />
