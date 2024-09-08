@@ -10,7 +10,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { documentApi } from "../utils/documentUtils";
-import { documentsAtom } from "../state/documents";
+import { documentsAtom, selectedDocumentAtom } from "../state/documents";
 import { type Document } from "shared/schema/document";
 import { useAtom } from "jotai";
 import { useState } from "react";
@@ -24,6 +24,7 @@ export function FileDeleteModal({ isOpen, onClose, s3_key }: FileModalProps) {
   const toast = useToast();
   const [, setDocuments] = useAtom(documentsAtom);
   const [deleting, setDeleting] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useAtom(selectedDocumentAtom);
 
   async function deleteFile() {
     setDeleting(true);
@@ -38,6 +39,10 @@ export function FileDeleteModal({ isOpen, onClose, s3_key }: FileModalProps) {
           status: "success",
           isClosable: true,
         });
+        //if we are deleting the one that is currently selected, clear selected
+        if (selectedDocument?.s3_key === s3_key) {
+          setSelectedDocument(null);
+        }
         const d: Document[] = await documentApi.getAll();
         setDeleting(false);
         setDocuments(d);
@@ -61,7 +66,7 @@ export function FileDeleteModal({ isOpen, onClose, s3_key }: FileModalProps) {
         <ModalBody>Are you sure you want to delete this file?</ModalBody>
 
         <ModalFooter>
-          <Button id="" colorScheme="ghost" mr={3} onClick={onClose} hidden={deleting}>
+          <Button id="" colorScheme="gray" mr={3} onClick={onClose} hidden={deleting}>
             Cancel
           </Button>
           <Button colorScheme="red" onClick={deleteFile} aria-disabled={deleting}>
