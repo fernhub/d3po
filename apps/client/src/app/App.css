@@ -4,6 +4,7 @@ body,
 .css-9im5hd {
   height: 100% !important;
   min-height: 100% !important;
+  background-color: #4f4f4a;
 }
 
 .layout {
@@ -13,11 +14,11 @@ body,
 
 .chat_container {
   margin: 1% 1% 1% 1%;
+  padding-bottom: 1%;
   height: 98%;
   min-height: 98%;
   width: 98%;
   min-width: 98%;
-  background-color: blue;
 }
 
 .file_drop_area {
@@ -96,7 +97,6 @@ body,
   min-width: 100%;
   height: 90%;
   min-height: 90%;
-  background-color: bisque;
   overflow-y: scroll;
 }
 
@@ -128,13 +128,16 @@ body,
 .chat-message {
   width: 50%;
   max-width: 50%;
-  padding-bottom: 2%;
+  margin-top: 1%;
+  margin-bottom: 1%;
 }
 
 .chat-message-ai {
   float: left;
+  clear: right;
 }
 
 .chat-message-self {
   float: right;
+  clear: left;
 }
