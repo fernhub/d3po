@@ -10,7 +10,6 @@ import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import {
   S3Client,
-  GetObjectCommand,
   S3ClientConfig,
   PutObjectCommand,
   DeleteObjectCommand,
@@ -20,6 +19,7 @@ import { cDocument } from "$/db/cDocument";
 import { DOCUMENT_STATUS } from "shared/enums/document";
 import { HttpStatus } from "shared/enums/http-status.enums";
 import { HttpError } from "shared/exceptions/HttpError";
+import { getS3Config } from "$/utils/s3";
 
 /**
  * Create a hashed key, with the original file extension, for upload to s3 so that names are hidden and unique in bucket
@@ -44,14 +44,7 @@ async function beginUpload(req: Request, res: Response, next: NextFunction) {
   //create a hash of the raw doc name + user_id to ensure uniqueness
   const key = await _getDocumentKey(`${uuidv4()}${req.user}`);
   try {
-    const s3Configuration: S3ClientConfig = {
-      credentials: {
-        accessKeyId: process.env.S3_ACCESS_KEY!,
-        secretAccessKey: process.env.S3_SECRET_KEY!,
-      },
-      region: process.env.S3_REGION,
-    };
-    const s3 = new S3Client(s3Configuration);
+    const s3 = new S3Client(getS3Config());
     const command = new PutObjectCommand({
       Bucket: process.env.S3_BUCKET,
       Key: key,
@@ -118,14 +111,7 @@ async function deleteDocument(req: Request, res: Response, next: NextFunction) {
     const user_id = req.user;
     console.log(`user: ${user_id}`);
 
-    const s3Configuration: S3ClientConfig = {
-      credentials: {
-        accessKeyId: process.env.S3_ACCESS_KEY!,
-        secretAccessKey: process.env.S3_SECRET_KEY!,
-      },
-      region: process.env.S3_REGION,
-    };
-    const s3 = new S3Client(s3Configuration);
+    const s3 = new S3Client(getS3Config());
     const command = new DeleteObjectCommand({
       Bucket: process.env.S3_BUCKET,
       Key: s3_key,

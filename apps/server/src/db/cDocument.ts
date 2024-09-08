@@ -55,4 +55,13 @@ export const cDocument = {
       throw new Error("Error deleting document");
     }
   },
+  isUserOwner: async function (document_key: string, user_id: string): Promise<boolean> {
+    const queryResult: QueryResult = await db.query(
+      `SELECT user_id FROM documents WHERE s3_key='${document_key}'`
+    );
+    if (queryResult.rowCount !== 1) {
+      throw new Error("No matching document found");
+    }
+    return queryResult.rows[0].user_id === user_id;
+  },
 };

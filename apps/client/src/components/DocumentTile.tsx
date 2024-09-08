@@ -24,7 +24,10 @@ export function DocumentTile({ document }: TileProps) {
               aria-label="See menu"
               float="right"
               icon={<DeleteIcon />}
-              onClick={onOpen}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpen();
+              }}
             />
           </HStack>
         </CardBody>
