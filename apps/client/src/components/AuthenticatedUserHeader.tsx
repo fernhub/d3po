@@ -18,11 +18,11 @@ export default function AuthenticatedUserHeader() {
         {user!.name}
       </MenuButton>
       <MenuList>
-        <MenuGroup title={user!.name}>
+        {/* <MenuGroup>
           <MenuItem>My Account</MenuItem>
           <MenuItem>Settings</MenuItem>
         </MenuGroup>
-        <MenuDivider />
+        <MenuDivider /> */}
         <MenuGroup>
           <MenuItem color="red" onClick={logout}>
             Logout
