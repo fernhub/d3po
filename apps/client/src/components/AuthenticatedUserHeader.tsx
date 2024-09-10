@@ -1,13 +1,5 @@
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import {
-  Button,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuGroup,
-  MenuItem,
-  MenuList,
-} from "@chakra-ui/react";
+import { Button, Menu, MenuButton, MenuGroup, MenuItem, MenuList } from "@chakra-ui/react";
 import { useAuth } from "../context/AuthContext";
 
 export default function AuthenticatedUserHeader() {
