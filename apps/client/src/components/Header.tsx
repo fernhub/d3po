@@ -1,20 +1,15 @@
 import { Grid, GridItem, Image } from "@chakra-ui/react";
-import logo from "../assets/logo/svg/logo-no-background.svg";
+import logo from "../assets/logo/png/d-3po-high-resolution-logo-white-transparent.png";
 import HeaderUserInfo from "./HeaderUserInfo";
-import { useAuth } from "../context/AuthContext";
-import { ChatModelSelector } from "./ChatModelSelector";
 
 function Header() {
-  const { isLoggedIn } = useAuth();
   return (
-    <Grid templateColumns="repeat(8, 1fr)" templateRows="1">
-      <GridItem pl={20} colSpan={1} alignContent="center">
+    <Grid templateColumns="repeat(8, 1fr)" templateRows="1" className="app-header">
+      <GridItem pl={20} colSpan={1} className="header-logo">
         <Image src={logo} />
       </GridItem>
-      <GridItem colSpan={6} textAlign="center" alignContent="center">
-        {isLoggedIn ? <ChatModelSelector /> : <></>}
-      </GridItem>
-      <GridItem colSpan={1} pr={20} textAlign="right" alignContent="center">
+      <GridItem colSpan={6}></GridItem>
+      <GridItem colSpan={1} pr={20} textAlign="right">
         <HeaderUserInfo />
       </GridItem>
     </Grid>
