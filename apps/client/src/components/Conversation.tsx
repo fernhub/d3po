@@ -1,4 +1,4 @@
-import { Box, Divider } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { ChatMessage } from "./ChatMessage";
 import { ChatMessagesAtom } from "../state/chat";
 import { useAtom } from "jotai";
@@ -7,12 +7,9 @@ export function Conversation() {
   const [messages] = useAtom(ChatMessagesAtom);
 
   return (
-    <Box className="llm-chat-messages">
+    <Box>
       {messages.map((message, index) => (
-        <>
-          {index == 0 ? <></> : <Divider />}
-          <ChatMessage key={index} message={message} />
-        </>
+        <ChatMessage key={index} message={message} />
       ))}
     </Box>
   );
