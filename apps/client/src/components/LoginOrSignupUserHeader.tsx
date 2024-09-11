@@ -1,5 +1,4 @@
 import {
-  Button,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -22,20 +21,20 @@ export default function LoginOrSignupUserHeader() {
 
   return (
     <>
-      <Button onClick={onOpen} colorScheme="teal" variant="link">
+      <h2 onClick={onOpen} className="login-or-signup">
         Login or Signup
-      </Button>
+      </h2>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent>
-          <Tabs isFitted variant="enclosed">
+        <ModalContent className="login-or-signup-modal">
+          <Tabs isFitted variant="enclosed" className="login-or-signup-modal">
             <TabList mb="1em">
               <Tab>Login</Tab>
               <Tab>Create Account</Tab>
             </TabList>
             <ModalCloseButton />
-            <TabPanels>
+            <TabPanels className="login-or-signup-modal">
               <TabPanel>
                 <ModalBody>
                   <LoginForm />
@@ -47,7 +46,7 @@ export default function LoginOrSignupUserHeader() {
                 </ModalBody>
               </TabPanel>
             </TabPanels>
-            <ModalFooter></ModalFooter>
+            <ModalFooter className="login-or-signup-modal"></ModalFooter>
           </Tabs>
         </ModalContent>
       </Modal>
