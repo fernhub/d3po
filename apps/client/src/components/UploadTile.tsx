@@ -8,7 +8,7 @@ export function UploadTile() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File>();
   const [uploading, setUploading] = useState(false);
-  const [, setDocuments] = useAtom(documentsAtom);
+  const [documents, setDocuments] = useAtom(documentsAtom);
   const toast = useToast();
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -21,6 +21,7 @@ export function UploadTile() {
   }
 
   function openFileSelector(e: React.MouseEvent) {
+    console.log(documents.length);
     e.preventDefault();
     e.stopPropagation();
     if (!inputRef || !inputRef.current) return;
@@ -58,17 +59,21 @@ export function UploadTile() {
           status: "error",
           isClosable: true,
         });
+        setUploading(false);
       });
   }
   return (
     <>
-      <Flex className="option-item" onClick={openFileSelector}>
+      <Flex
+        className="option-item"
+        onClick={openFileSelector}
+        aria-disabled={documents.length >= 10}>
         <Text fontWeight={"600"} fontSize={"1em"}>
           {!file ? "Upload New Document" : `Upload: ${file.name}`}
         </Text>
         {!file && (
           <Button
-            disabled={uploading}
+            disabled={uploading || documents.length >= 10}
             backgroundColor={"#853bce"}
             color={"white"}
             width="140px"
@@ -112,7 +117,13 @@ export function UploadTile() {
           </HStack>
         )}
       </Flex>
-      <input type="file" ref={inputRef} onChange={handleFileChange} hidden />
+      <input
+        type="file"
+        accept="application/pdf"
+        ref={inputRef}
+        onChange={handleFileChange}
+        hidden
+      />
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { Flex, Heading, Spinner } from "@chakra-ui/react";
+import { Flex, Heading, Spinner, Text } from "@chakra-ui/react";
 import { DocumentTile } from "./DocumentTile";
 import { useEffect } from "react";
 import { documentApi } from "../utils/documentUtils";
@@ -65,6 +65,9 @@ export function OptionsContainer() {
           </>
         )}
       </Flex>
+      <Text hidden={documents.length < 10} className="exceeded-documents-limit">
+        DOCUMENT LIMIT EXCEEDED: Delete a document before you can upload another
+      </Text>
     </>
   );
 }
