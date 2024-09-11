@@ -3,6 +3,7 @@ import { z } from "zod";
 import { HttpError } from "shared/exceptions/HttpError";
 import { HttpStatus } from "shared/enums/http-status.enums";
 import { Socket } from "socket.io";
+import { SQLError } from "shared/exceptions/SQLError";
 
 export function errorHandler(err: unknown, req: Request, res: Response, _next: NextFunction): void {
   console.log("in error handler");
@@ -19,6 +20,11 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
       message: err.message,
     });
     return;
+  } else if (err instanceof SQLError) {
+    console.log(err.stack);
+    res.status(HttpStatus.BAD_REQUEST).json({
+      message: err.message,
+    });
   } else {
     console.log(err);
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

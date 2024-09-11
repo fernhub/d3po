@@ -66,7 +66,6 @@ io.on("connection", async (socket) => {
     const query = socketConnectionQuerySchema.parse(socket.handshake.query);
 
     console.log(`User connected ${query.user_id}`);
-    console.log(query);
 
     console.log("loading");
     const url = await getUrlForS3Document(query.document_key, query.user_id);

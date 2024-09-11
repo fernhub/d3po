@@ -8,18 +8,14 @@ import {
 } from "shared/schema/document";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
-import {
-  S3Client,
-  S3ClientConfig,
-  PutObjectCommand,
-  DeleteObjectCommand,
-} from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { cDocument } from "$/db/cDocument";
 import { DOCUMENT_STATUS } from "shared/enums/document";
 import { HttpStatus } from "shared/enums/http-status.enums";
 import { HttpError } from "shared/exceptions/HttpError";
 import { getS3Config } from "$/utils/s3";
+import { validateUserIsOwner } from "$/utils/documentUtils";
 
 /**
  * Create a hashed key, with the original file extension, for upload to s3 so that names are hidden and unique in bucket
@@ -35,15 +31,17 @@ async function _getDocumentKey(key: string) {
 }
 
 async function beginUpload(req: Request, res: Response, next: NextFunction) {
-  const parse = newDocumentSchema.safeParse(req.body);
-  if (parse.error) {
-    next(parse.error);
-    return;
-  }
-  const { name } = parse.data;
-  //create a hash of the raw doc name + user_id to ensure uniqueness
-  const key = await _getDocumentKey(`${uuidv4()}${req.user}`);
   try {
+    const parse = newDocumentSchema.safeParse(req.body);
+    if (parse.error) {
+      next(parse.error);
+      return;
+    }
+
+    const { name } = parse.data;
+    //create a hash of the raw doc name + user_id to ensure uniqueness
+    const key = await _getDocumentKey(`${uuidv4()}${req.user}`);
+
     const s3 = new S3Client(getS3Config());
     const command = new PutObjectCommand({
       Bucket: process.env.S3_BUCKET,
@@ -61,19 +59,26 @@ async function beginUpload(req: Request, res: Response, next: NextFunction) {
     console.log("Presigned URL: ", url);
     res.status(200).send({ presignedUrl: url, s3_key: key });
   } catch (err) {
+    console.log(err);
     next(err);
     return;
   }
 }
 
 async function updateDocument(req: Request, res: Response, next: NextFunction) {
-  const parse = updateDocumentRequestSchema.safeParse(req.body);
-  if (parse.error) {
-    next(parse.error);
-    return;
-  }
-  const { s3_key, status } = parse.data;
   try {
+    const parse = updateDocumentRequestSchema.safeParse(req.body);
+    if (parse.error) {
+      next(parse.error);
+      return;
+    }
+
+    const { s3_key, status } = parse.data;
+    if (!validateUserIsOwner(s3_key, req.user)) {
+      next(new HttpError({ message: "Invalid request", code: HttpStatus.BAD_REQUEST }));
+      return;
+    }
+
     const updateDocRes: UpdateDocument = await cDocument.updateDocument({
       user_id: req.user,
       s3_key: s3_key,
@@ -98,18 +103,22 @@ async function getAll(req: Request, res: Response, next: NextFunction) {
 }
 
 async function deleteDocument(req: Request, res: Response, next: NextFunction) {
-  console.log("in delete");
-  const parse = deleteDocumentSchema.safeParse(req.body);
-  if (parse.error) {
-    next(parse.error);
-    return;
-  }
-  const { s3_key } = parse.data;
-  console.log(`key: ${s3_key}`);
-
   try {
+    console.log("in delete");
+    const parse = deleteDocumentSchema.safeParse(req.body);
+    if (parse.error) {
+      next(parse.error);
+      return;
+    }
+    const { s3_key } = parse.data;
+    console.log(`key: ${s3_key}`);
+
     const user_id = req.user;
     console.log(`user: ${user_id}`);
+    if (!validateUserIsOwner(s3_key, req.user)) {
+      next(new HttpError({ message: "Invalid request", code: HttpStatus.BAD_REQUEST }));
+      return;
+    }
 
     const s3 = new S3Client(getS3Config());
     const command = new DeleteObjectCommand({
