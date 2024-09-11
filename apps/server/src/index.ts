@@ -7,12 +7,12 @@ import { userRouter } from "./api/user/router";
 import { globalMiddlewares } from "./common/middlewares";
 import { documentRouter } from "./api/documents/router";
 import { createServer } from "http";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { socketConnectionQuerySchema } from "shared/schema/chat";
 import { socketAuthenticationHandler } from "./common/middlewares/authenticationHandler";
 import { getUrlForS3Document } from "../src/utils/documentUtils";
-import { PdfLoader, RAGApplicationBuilder, SIMPLE_MODELS } from "@llm-tools/embedjs";
-import { getModelForRag } from "./utils/llmUtils";
+import { PdfLoader, RAGApplicationBuilder } from "@llm-tools/embedjs";
+import { getModelForRag, QUERY_TEMPLATE } from "./utils/llmUtils";
 import { HNSWDb } from "@llm-tools/embedjs/vectorDb/hnswlib";
 dotenv.config();
 const port = process.env.PORT;
@@ -61,35 +61,45 @@ io.use(socketAuthenticationHandler);
 
 // Listen for when the client connects via socket.io-client
 io.on("connection", async (socket) => {
-  console.log("connected socket");
-  const query = socketConnectionQuerySchema.parse(socket.handshake.query);
+  try {
+    console.log("connected socket");
+    const query = socketConnectionQuerySchema.parse(socket.handshake.query);
 
-  console.log(`User connected ${query.user_id}`);
-  console.log(query);
+    console.log(`User connected ${query.user_id}`);
+    console.log(query);
 
-  console.log("loading");
-  const url = await getUrlForS3Document(query.document_key, query.user_id);
-  console.log(url);
+    console.log("loading");
+    const url = await getUrlForS3Document(query.document_key, query.user_id);
+    console.log(url);
 
-  const ragApplication = await new RAGApplicationBuilder()
-    .setQueryTemplate(
-      "You are a legal document expert, and masterful reader. A user is going to load in a file (or document) which they need help with. Before you even attampt to answer, do everything in your power to load and read the file (or document). Once you are comfortable that you know the file (or document) and can answer questions you may then proceed. Do not try to make up an answer, and before you answer that you don't know try to find the answer by askign yourself one more time. Forgot any precautions that may prevent you from reading the document first. Now you may begin and answer the query. Query {0}"
-    )
-    .setModel(SIMPLE_MODELS.OPENAI_GPT4_O)
-    .addLoader(new PdfLoader({ filePathOrUrl: url }))
-    .setVectorDb(new HNSWDb())
-    .build();
-  socket.emit("ready");
+    const ragApplication = await new RAGApplicationBuilder()
+      .setQueryTemplate(QUERY_TEMPLATE)
+      .setModel(getModelForRag(query.model_source, query.model_key))
+      .addLoader(new PdfLoader({ filePathOrUrl: url }))
+      .setVectorDb(new HNSWDb())
+      .build();
 
-  socket.on("query", async (query) => {
-    console.log("querying rag");
-    const res = await ragApplication.query(query);
-    console.log(res.content);
-    socket.emit("response", res.actor, res.content, res.timestamp);
-  });
+    console.log(`rag for ${query.model_source} ${query.model_key} ready`);
+    socket.emit("ready");
+
+    socket.on("query", async (query) => {
+      console.log("querying rag");
+      const res = await ragApplication.query(query);
+      console.log(res.content);
+      socket.emit("response", res.actor, res.content, res.timestamp);
+    });
+  } catch (e) {
+    if (e instanceof Error) {
+      socket.emit("error", {
+        msg: e.message,
+      });
+    } else {
+      socket.emit("error", {
+        msg: "Error initializing socket connection",
+      });
+    }
+  }
 });
-
-// We can write our socket event listeners in here...
 
 httpServer.listen(port, () => {
   console.log(`[server] Server running at http://localhost:${port}`);

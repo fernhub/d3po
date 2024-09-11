@@ -6,7 +6,11 @@ export default function AuthenticatedUserHeader() {
   const { user, logout } = useAuth();
   return (
     <Menu>
-      <MenuButton as={Button} colorScheme="pink" rightIcon={<ChevronDownIcon />}>
+      <MenuButton
+        as={Button}
+        backgroundColor="#853bce"
+        color="white"
+        rightIcon={<ChevronDownIcon />}>
         {user!.name}
       </MenuButton>
       <MenuList>
