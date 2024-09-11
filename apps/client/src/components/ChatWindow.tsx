@@ -1,15 +1,14 @@
 import { ArrowUpIcon } from "@chakra-ui/icons";
-import { Box, Flex, Spinner, Textarea } from "@chakra-ui/react";
-import { type Model } from "shared/schema/model";
+import { Alert, AlertIcon, Box, Flex, Spinner, Textarea } from "@chakra-ui/react";
 import { type Document } from "shared/schema/document";
 import { ChangeEvent, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { Conversation } from "./Conversation";
-import { ChatMessagesAtom } from "../state/chat";
+import { chatStateAtom, chatMessagesAtom } from "../state/chat";
 import { useAtom } from "jotai";
 import { ChatMessage } from "shared/schema/chat";
 import { useAuth } from "../context/AuthContext";
-import { MODEL_SOURCE } from "shared/enums/models";
+import { selectedModelAtom } from "../state/selectedModel";
 
 type ChatWindowProps = {
   selectedDocument: Document | null;
@@ -17,15 +16,10 @@ type ChatWindowProps = {
 
 export function ChatWindow({ selectedDocument }: ChatWindowProps) {
   const [llmQuery, setLlmQuery] = useState("");
-  const [, setChatMessages] = useAtom(ChatMessagesAtom);
+  const [, setChatMessages] = useAtom(chatMessagesAtom);
   const [chatSocket, setChatSocket] = useState<Socket>();
-  const [loading, setLoading] = useState(true);
-  const [selectedModel] = useState<Model>({
-    source: MODEL_SOURCE.OpenAI,
-    model: "OPENAI_GPT4_0",
-    display_name: "GPT 4.0",
-    key: 2,
-  });
+  const [chatState, setChatState] = useAtom(chatStateAtom);
+  const [selectedModel] = useAtom(selectedModelAtom);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -52,15 +46,21 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
           timestamp: new Date(),
         },
       ]);
-      setLoading(false);
+      setChatState("waiting");
     });
-    socket.on("connect_error", function (err) {
+    socket.on("connect_error", (err) => {
       //TODO: something with err
       console.log("error on connect");
       console.log(err.message);
+      setChatState("error");
+    });
+    socket.on("error", (err) => {
+      console.log(err);
+      setChatState("error");
     });
 
     socket.on("response", (actor, content, timestamp) => {
+      setChatState("waiting");
       console.log(actor, content, timestamp);
       const response: ChatMessage = {
         actor: actor,
@@ -81,7 +81,7 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
       cleanupSocket();
       window.removeEventListener("beforeunload", cleanupSocket);
     };
-  }, [selectedModel, selectedDocument, user, setChatMessages]);
+  }, [selectedModel, selectedDocument, user, setChatMessages, setChatState]);
 
   function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
     const inputValue = e.target.value;
@@ -91,6 +91,7 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
   function sendMessage() {
     console.log("sending question");
     console.log(llmQuery);
+    setChatState("sending");
     setLlmQuery("");
     setChatMessages((prevChatMessages) => [
       ...prevChatMessages,
@@ -103,60 +104,54 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
     chatSocket.emit("query", llmQuery);
   }
 
+  function getPlaceholder() {
+    switch (chatState) {
+      case "loading":
+        return "Preparing model...";
+      case "sending":
+        return "Waiting on response...";
+      case "error":
+        return "There was an error, see alert for more details.";
+      default:
+        return `Ask ${selectedModel!.display_name} about ${selectedDocument!.name}...`;
+    }
+  }
+
   return (
-    // <VStack className="llm-chat-window">
-    //   <Conversation />
-    //   <Box className="llm-chat-input-container">
-    //     <textarea
-    //       id="llm-chat-input-text"
-    //       placeholder={
-    //         disabled
-    //           ? "Select/upload a document and select a model to begin"
-    //           : `Ask ${selectedModel!.display_name} about ${selectedDocument!.name}...`
-    //       }
-    //       value={llmQuery}
-    //       onChange={handleInputChange}
-    //       disabled={disabled}
-    //     />
-    //     <IconButton
-    //       id="llm-chat-button"
-    //       aria-label="send question to llm"
-    //       icon={<ArrowUpIcon />}
-    //       backgroundColor="beige"
-    //       onClick={sendMessage}
-    //       disabled={disabled}
-    //     />
-    //   </Box>
-    // </VStack>
     <Box className="chat_window">
       <Flex id="llm-chat-messages">
-        {loading && (
+        {chatState === "loading" && (
           <Flex className="loading_container">
             <Spinner size="xl" />
           </Flex>
         )}
-        {!loading && <Conversation />}
+        {chatState === "error" && (
+          <Flex className="loading_container">
+            <Alert status="error" className="alert-error">
+              <AlertIcon className="alert-icon" />
+              There was an error processing your request, please select a different model or try
+              again
+            </Alert>
+          </Flex>
+        )}
+        {(chatState === "waiting" || chatState === "sending") && <Conversation />}
       </Flex>
 
       <Flex id="llm-chat-input-container">
         <Textarea
           id="llm-chat-input-text"
-          placeholder={
-            loading
-              ? "Preparing model..."
-              : `Ask ${selectedModel!.display_name} about ${selectedDocument!.name}...`
-          }
+          placeholder={getPlaceholder()}
           value={llmQuery}
           onChange={handleInputChange}
-          disabled={loading}
+          disabled={chatState !== "waiting"}
         />
         <Flex id="llm-chat-button-container">
           <Flex
             id="llm-chat-button"
             aria-label="send question to llm"
-            cursor={loading ? "cursor" : "pointer"}
+            cursor={chatState === "loading" ? "cursor" : "pointer"}
             onClick={sendMessage}
-            aria-disabled={loading}>
+            aria-disabled={chatState !== "waiting"}>
             <ArrowUpIcon width={"1.5em"} height={"1.5em"} />
           </Flex>
         </Flex>

@@ -1,17 +1,21 @@
 import { Flex, Heading, Spinner } from "@chakra-ui/react";
 import { DocumentTile } from "./DocumentTile";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { documentApi } from "../utils/documentUtils";
 import { useAtom } from "jotai";
 import { documentsAtom, selectedDocumentAtom } from "../state/documents";
 import { type Document } from "shared/schema/document";
 import { modeAtom } from "../state/mode";
 import { UploadTile } from "./UploadTile";
+import { DEFAULT_MODEL } from "shared/enums/models";
+import { selectedModelAtom } from "../state/selectedModel";
+import { chatStateAtom } from "../state/chat";
 
 export function OptionsContainer() {
   const [documents, setDocuments] = useAtom(documentsAtom);
+  const [, setSelectedModel] = useAtom(selectedModelAtom);
   const [, setSelectedDocument] = useAtom(selectedDocumentAtom);
-  const [loading, setLoading] = useState(true);
+  const [chatState, setChatState] = useAtom(chatStateAtom);
   const [mode, setMode] = useAtom(modeAtom);
 
   useEffect(() => {
@@ -19,10 +23,10 @@ export function OptionsContainer() {
     const getDocuments = async () => {
       const d: Document[] = await documentApi.getAll();
       setDocuments(d);
-      setLoading(false);
+      setChatState("waiting");
     };
     getDocuments();
-  }, []);
+  }, [setDocuments, setChatState]);
 
   function renderDocuments() {
     console.log("rendering documents");
@@ -33,7 +37,9 @@ export function OptionsContainer() {
           key={index}
           document={document}
           onClick={() => {
+            setChatState("loading");
             setSelectedDocument(document);
+            setSelectedModel(DEFAULT_MODEL);
             setMode("chat");
           }}
         />
@@ -42,7 +48,7 @@ export function OptionsContainer() {
   }
   return (
     <>
-      {!loading && (
+      {chatState === "waiting" && (
         <Heading className="welcome-heading">
           {documents.length == 0
             ? "Upload a new document and begin interacting with the llm of your choice"
@@ -50,9 +56,9 @@ export function OptionsContainer() {
         </Heading>
       )}
       <Flex className="options_container" justifyContent={documents.length < 2 ? "center" : ""}>
-        {loading && <Spinner />}
+        {chatState === "loading" && <Spinner />}
 
-        {mode === "options" && !loading && (
+        {mode === "options" && chatState !== "loading" && (
           <>
             <UploadTile />
             {renderDocuments()}

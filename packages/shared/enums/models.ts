@@ -10,6 +10,13 @@ export enum MODEL_SOURCE {
   Anthropic = "Anthropic",
 }
 
+export const DEFAULT_MODEL = {
+  source: MODEL_SOURCE.OpenAI,
+  model: "OPENAI_GPT4o",
+  display_name: "GPT 4o",
+  key: 2,
+};
+
 export const MODELS: modelDefinitions = {
   OpenAI: [
     {
@@ -26,8 +33,8 @@ export const MODELS: modelDefinitions = {
     },
     {
       source: MODEL_SOURCE.OpenAI,
-      model: "OPENAI_GPT4_0",
-      display_name: "GPT 4.0",
+      model: "OPENAI_GPT4o",
+      display_name: "GPT 4o",
       key: 2,
     },
   ],
