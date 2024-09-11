@@ -1,5 +1,5 @@
 import { MODEL_SOURCE } from "shared/enums/models";
-import { Anthropic, HuggingFace, SIMPLE_MODELS } from "@llm-tools/embedjs";
+import { Anthropic, HuggingFace, RAGApplication, SIMPLE_MODELS } from "@llm-tools/embedjs";
 
 export function getModelForRag(model_source: MODEL_SOURCE, model_key: string | number) {
   switch (model_source) {
