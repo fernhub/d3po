@@ -9,13 +9,13 @@ import { modeAtom } from "../state/mode";
 import { UploadTile } from "./UploadTile";
 import { DEFAULT_MODEL } from "shared/enums/models";
 import { selectedModelAtom } from "../state/selectedModel";
-import { chatStateAtom } from "../state/chat";
+import { appStateAtom } from "../state/app";
 
 export function OptionsContainer() {
   const [documents, setDocuments] = useAtom(documentsAtom);
   const [, setSelectedModel] = useAtom(selectedModelAtom);
   const [, setSelectedDocument] = useAtom(selectedDocumentAtom);
-  const [chatState, setChatState] = useAtom(chatStateAtom);
+  const [appState, setAppState] = useAtom(appStateAtom);
   const [mode, setMode] = useAtom(modeAtom);
 
   useEffect(() => {
@@ -23,10 +23,10 @@ export function OptionsContainer() {
     const getDocuments = async () => {
       const d: Document[] = await documentApi.getAll();
       setDocuments(d);
-      setChatState("waiting");
+      setAppState("waiting");
     };
     getDocuments();
-  }, [setDocuments, setChatState]);
+  }, [setDocuments, setAppState]);
 
   function renderDocuments() {
     console.log("rendering documents");
@@ -37,7 +37,7 @@ export function OptionsContainer() {
           key={index}
           document={document}
           onClick={() => {
-            setChatState("loading");
+            setAppState("loading");
             setSelectedDocument(document);
             setSelectedModel(DEFAULT_MODEL);
             setMode("chat");
@@ -48,7 +48,7 @@ export function OptionsContainer() {
   }
   return (
     <>
-      {chatState === "waiting" && (
+      {appState === "waiting" && (
         <Heading className="welcome-heading">
           {documents.length == 0
             ? "Upload a new document and begin interacting with the llm of your choice"
@@ -56,9 +56,9 @@ export function OptionsContainer() {
         </Heading>
       )}
       <Flex className="options_container" justifyContent={documents.length < 2 ? "center" : ""}>
-        {chatState === "loading" && <Spinner />}
+        {appState === "loading" && <Spinner />}
 
-        {mode === "options" && chatState !== "loading" && (
+        {mode === "options" && appState !== "loading" && (
           <>
             <UploadTile />
             {renderDocuments()}
