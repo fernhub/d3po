@@ -120,9 +120,21 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
   return (
     <Box className="chat_window">
       <Flex id="llm-chat-messages">
-        <Flex className="loading_container">
-          <Spinner size="xl" />
-        </Flex>
+        {chatState === "loading" && (
+          <Flex className="loading_container">
+            <Spinner size="xl" />
+          </Flex>
+        )}
+        {chatState === "error" && (
+          <Flex className="loading_container">
+            <Alert status="error" className="alert-error">
+              <AlertIcon className="alert-icon" />
+              There was an error processing your request, please select a different model or try
+              again
+            </Alert>
+          </Flex>
+        )}
+        {(chatState === "waiting" || chatState === "sending") && <Conversation />}
       </Flex>
 
       <Flex id="llm-chat-input-container">
