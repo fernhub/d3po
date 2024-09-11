@@ -1,6 +1,6 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import "./App.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "../context/AuthContext";
 import { Provider } from "jotai";
 
@@ -10,6 +10,10 @@ function App() {
     {
       path: "/",
       element: <Layout />,
+    },
+    {
+      path: "*",
+      element: <Navigate to="/" replace />,
     },
   ]);
 
