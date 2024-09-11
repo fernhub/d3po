@@ -4,7 +4,8 @@ import { type Document } from "shared/schema/document";
 import { ChangeEvent, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { Conversation } from "./Conversation";
-import { chatStateAtom, chatMessagesAtom } from "../state/chat";
+import { chatMessagesAtom } from "../state/chat";
+import { appStateAtom } from "../state/app";
 import { useAtom } from "jotai";
 import { ChatMessage } from "shared/schema/chat";
 import { useAuth } from "../context/AuthContext";
@@ -18,8 +19,9 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
   const [llmQuery, setLlmQuery] = useState("");
   const [, setChatMessages] = useAtom(chatMessagesAtom);
   const [chatSocket, setChatSocket] = useState<Socket>();
-  const [chatState, setChatState] = useAtom(chatStateAtom);
+  const [appState, setAppState] = useAtom(appStateAtom);
   const [selectedModel] = useAtom(selectedModelAtom);
+  const [chatError, setChatError] = useState("");
   const { user } = useAuth();
 
   useEffect(() => {
@@ -29,15 +31,11 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
       model_source: selectedModel?.source,
       model_key: selectedModel?.key,
     };
-    console.log("creating socket");
-    console.log(query);
     const socket = io("http://localhost:5001", {
       query: query,
       withCredentials: true,
     });
-    socket.on("connect", () => {
-      console.log("successfully connected");
-    });
+    socket.on("connect", () => {});
     socket.on("ready", () => {
       setChatMessages([
         {
@@ -46,22 +44,26 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
           timestamp: new Date(),
         },
       ]);
-      setChatState("waiting");
+      setAppState("waiting");
     });
-    socket.on("connect_error", (err) => {
+    socket.on("connect_error", () => {
       //TODO: something with err
-      console.log("error on connect");
-      console.log(err.message);
-      setChatState("error");
+      setAppState("error");
+      setChatError("Error connecting to llm, please try again");
     });
     socket.on("error", (err) => {
-      console.log(err);
-      setChatState("error");
+      setAppState("error");
+      if (err.msg.includes("credit")) {
+        setChatError(
+          `: Insuffcient credits for this model. Please select a different model or add credits`
+        );
+      } else {
+        setChatError(", please select a different model or try again");
+      }
     });
 
     socket.on("response", (actor, content, timestamp) => {
-      setChatState("waiting");
-      console.log(actor, content, timestamp);
+      setAppState("waiting");
       const response: ChatMessage = {
         actor: actor,
         content: content,
@@ -72,7 +74,6 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
 
     setChatSocket(socket);
     const cleanupSocket = () => {
-      console.log("dismounting and disconnecting socket");
       socket.off();
       socket.disconnect();
     };
@@ -81,7 +82,7 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
       cleanupSocket();
       window.removeEventListener("beforeunload", cleanupSocket);
     };
-  }, [selectedModel, selectedDocument, user, setChatMessages, setChatState]);
+  }, [selectedModel, selectedDocument, user, setChatMessages, setAppState]);
 
   function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
     const inputValue = e.target.value;
@@ -89,15 +90,15 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
   }
 
   function sendMessage() {
-    console.log("sending question");
-    console.log(llmQuery);
-    setChatState("sending");
+    setAppState("sending");
     setLlmQuery("");
     setChatMessages((prevChatMessages) => [
       ...prevChatMessages,
       { actor: "self", content: llmQuery, timestamp: new Date() },
     ]);
     if (!chatSocket) {
+      setAppState("error");
+      setChatError("Unkown");
       console.log("error sending");
       return;
     }
@@ -105,7 +106,7 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
   }
 
   function getPlaceholder() {
-    switch (chatState) {
+    switch (appState) {
       case "loading":
         return "Preparing model...";
       case "sending":
@@ -120,21 +121,20 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
   return (
     <Box className="chat_window">
       <Flex id="llm-chat-messages">
-        {chatState === "loading" && (
+        {appState === "loading" && (
           <Flex className="loading_container">
             <Spinner size="xl" />
           </Flex>
         )}
-        {chatState === "error" && (
+        {appState === "error" && (
           <Flex className="loading_container">
             <Alert status="error" className="alert-error">
               <AlertIcon className="alert-icon" />
-              There was an error processing your request, please select a different model or try
-              again
+              {`There was an error processing your request${chatError}`}
             </Alert>
           </Flex>
         )}
-        {(chatState === "waiting" || chatState === "sending") && <Conversation />}
+        {(appState === "waiting" || appState === "sending") && <Conversation />}
       </Flex>
 
       <Flex id="llm-chat-input-container">
@@ -143,15 +143,15 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
           placeholder={getPlaceholder()}
           value={llmQuery}
           onChange={handleInputChange}
-          disabled={chatState !== "waiting"}
+          disabled={appState !== "waiting"}
         />
         <Flex id="llm-chat-button-container">
           <Flex
             id="llm-chat-button"
             aria-label="send question to llm"
-            cursor={chatState === "loading" ? "cursor" : "pointer"}
+            cursor={appState === "loading" ? "cursor" : "pointer"}
             onClick={sendMessage}
-            aria-disabled={chatState !== "waiting"}>
+            aria-disabled={appState !== "waiting"}>
             <ArrowUpIcon width={"1.5em"} height={"1.5em"} />
           </Flex>
         </Flex>

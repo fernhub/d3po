@@ -7,9 +7,11 @@ import anthropic_logo from "../assets/models/anthropic_logo.png";
 import mistral_logo from "../assets/models/mistral_logo.png";
 import openai_logo from "../assets/models/openai_logo.png";
 import { Fragment } from "react/jsx-runtime";
+import { appStateAtom } from "../state/app";
 
 export function ChatModelSelector() {
   const [selectedModel, setSelectedModel] = useAtom(selectedModelAtom);
+  const [, setAppState] = useAtom(appStateAtom);
 
   const logos: Record<string, string> = {
     OpenAI: openai_logo,
@@ -43,6 +45,7 @@ export function ChatModelSelector() {
           key={`${entry.model}_${index}`}
           onClick={() => {
             console.log("selecting model");
+            setAppState("loading");
             setSelectedModel(entry);
           }}>
           {entry.display_name}

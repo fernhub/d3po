@@ -10,7 +10,7 @@ export default function UnauthLayout() {
       color="blackAlpha.700"
       fontWeight="bold"
       className="layout">
-      <GridItem rowSpan={2} colSpan={10} pl="2" pt="2">
+      <GridItem rowSpan={2} colSpan={10} pl="2" pt="2" className="header">
         <Header />
       </GridItem>
       <GridItem rowSpan={18} colSpan={10} backgroundColor="black">

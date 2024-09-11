@@ -82,10 +82,36 @@ io.on("connection", async (socket) => {
     socket.emit("ready");
 
     socket.on("query", async (query) => {
-      console.log("querying rag");
-      const res = await ragApplication.query(query);
-      console.log(res.content);
-      socket.emit("response", res.actor, res.content, res.timestamp);
+      try {
+        console.log("querying rag");
+        const res = await ragApplication.query(query);
+        console.log(res.content);
+        socket.emit("response", res.actor, res.content, res.timestamp);
+      } catch (e) {
+        if (e instanceof Error) {
+          console.log("error type error");
+          console.log(e.message);
+          socket.emit("error", {
+            msg: e.message,
+          });
+        } else {
+          socket.emit("error", {
+            msg: "Error loading model",
+          });
+        }
+      }
+    });
+
+    socket.on("disconnect", async (reason) => {
+      console.log("disconnecting socket");
+      const embeddings = await ragApplication.getEmbeddingsCount();
+      console.log(embeddings);
+      const embeddingsDeleted = await ragApplication.deleteAllEmbeddings(true);
+      const embeddings2 = await ragApplication.getEmbeddingsCount();
+      console.log("rag embeddings deleted", embeddingsDeleted);
+      console.log("new embeddings count: ", embeddings2);
+      const allLoaders = await ragApplication.getLoaders();
+      console.log(allLoaders);
     });
   } catch (e) {
     if (e instanceof Error) {
