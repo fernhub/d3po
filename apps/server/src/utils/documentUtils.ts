@@ -26,7 +26,7 @@ export async function getUrlForS3Document(
       Key: document_key,
     });
     console.log("getting url for doc");
-    return await getSignedUrl(s3, command, { expiresIn: 40 });
+    return await getSignedUrl(s3, command, { expiresIn: 10 });
   } catch (e) {
     console.log(e);
     throw new Error("unable to get object from s3");
