@@ -1,4 +1,4 @@
-import { Grid, GridItem } from "@chakra-ui/react";
+import { Grid, GridItem, Heading } from "@chakra-ui/react";
 import Header from "./Header";
 
 export default function UnauthLayout() {
@@ -14,7 +14,10 @@ export default function UnauthLayout() {
         <Header />
       </GridItem>
       <GridItem rowSpan={18} colSpan={10} backgroundColor="black">
-        <div>home</div>
+        <div className="demo">Placeholder</div>
+        <Heading className="home-heading">
+          Get help interpreting your documents, minus the headache of switching LLMs
+        </Heading>
       </GridItem>
     </Grid>
   );
