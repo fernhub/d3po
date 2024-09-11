@@ -4,13 +4,14 @@ import { type ChatMessage } from "shared/schema/chat";
 
 type ChatMessageProps = {
   message: ChatMessage;
-  key: number;
+  index: number;
+  loop?: boolean;
 };
 
-export function ChatMessage({ message, key }: ChatMessageProps) {
+export function Message({ message, index, loop = false }: ChatMessageProps) {
   return (
     <Flex
-      key={key}
+      key={index}
       style={{
         alignSelf: message.actor === "self" ? "flex-end" : "flex-start",
         textAlign: message.actor === "self" ? "right" : "left",
@@ -29,7 +30,7 @@ export function ChatMessage({ message, key }: ChatMessageProps) {
         </Box>
       ) : (
         <Box className="chat-message-ai">
-          <ReactTyped typeSpeed={10} strings={[message.content]} showCursor={false} />
+          <ReactTyped typeSpeed={10} strings={[message.content]} showCursor={false} loop={loop} />
         </Box>
       )}
     </Flex>

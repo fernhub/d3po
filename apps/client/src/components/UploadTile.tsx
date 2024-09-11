@@ -47,6 +47,7 @@ export function UploadTile() {
           isClosable: true,
         });
         setUploading(false);
+        setFile(undefined);
         setDocuments(docs);
       })
       .catch(() => {
