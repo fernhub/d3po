@@ -13,8 +13,8 @@ export const cUser = {
    */
   findUserByEmail: async function (email: string): Promise<User | undefined> {
     console.log("finding user: ", email);
-    // console.log(`SELECT * from users where email='${email}'`);
-    const queryResult: QueryResult = await db.query(`SELECT * from users where email='${email}'`);
+
+    const queryResult: QueryResult = await db.query("SELECT * from users where email=$1", [email]);
     if (queryResult.rowCount === 0) {
       return undefined;
     } else {
@@ -30,7 +30,7 @@ export const cUser = {
   findUserById: async function (id: string): Promise<User | undefined> {
     console.log("finding user: ", id);
     // console.log(`SELECT * from users where email='${email}'`);
-    const queryResult: QueryResult = await db.query(`SELECT * from users where id='${id}'`);
+    const queryResult: QueryResult = await db.query("SELECT * from users where id=$1", [id]);
     if (queryResult.rowCount === 0) {
       console.log(`did not find user ${id}`);
       return undefined;
@@ -53,7 +53,8 @@ export const cUser = {
   createUser: async function (user: NewUser): Promise<User> {
     console.log("creating user: ", user.email);
     const queryResult: QueryResult = await db.query(
-      `INSERT INTO users (name, email, passhash) VALUES ('${user.name}', '${user.email}', '${user.password}') RETURNING id`
+      "INSERT INTO users (name, email, passhash) VALUES ($1, $2, $3) RETURNING id",
+      [user.name, user.email, user.password]
     );
     return {
       id: queryResult.rows[0].id,

@@ -15,30 +15,30 @@ function generateToken(userId: string) {
 }
 
 async function signupUser(req: Request, res: Response, next: NextFunction) {
-  // parse body from request
-  const parse = newUserSchema.safeParse(req.body);
-  if (parse.error) {
-    next(parse.error);
-    return;
-  }
-  const data = parse.data;
-
-  console.log(data);
-
-  const userExists = await cUser.findUserByEmail(data.email);
-  if (userExists) {
-    next(new HttpError({ message: "email already exists", code: HttpStatus.CONFLICT }));
-    return;
-  }
-  console.log("no");
-
-  // create hash password
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(data.password, salt);
-
-  console.log("pass hashed");
-
   try {
+    // parse body from request
+    const parse = newUserSchema.safeParse(req.body);
+    if (parse.error) {
+      next(parse.error);
+      return;
+    }
+    const data = parse.data;
+
+    console.log(data);
+
+    const userExists = await cUser.findUserByEmail(data.email);
+    if (userExists) {
+      next(new HttpError({ message: "email already exists", code: HttpStatus.CONFLICT }));
+      return;
+    }
+    console.log("no");
+
+    // create hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(data.password, salt);
+
+    console.log("pass hashed");
+
     //create user
     console.log("creating row");
 
@@ -71,46 +71,52 @@ async function signupUser(req: Request, res: Response, next: NextFunction) {
 }
 
 async function loginUser(req: Request, res: Response, next: NextFunction) {
-  const parse = userSchema
-    .omit({
-      id: true,
-      name: true,
-    })
-    .safeParse(req.body);
+  try {
+    const parse = userSchema
+      .omit({
+        id: true,
+        name: true,
+      })
+      .safeParse(req.body);
 
-  if (parse.error) {
-    next(parse.error);
-    return;
-  }
+    if (parse.error) {
+      next(parse.error);
+      return;
+    }
 
-  const { email, password } = parse.data;
+    const { email, password } = parse.data;
 
-  //fetch user
-  const user = await cUser.findUserByEmail(email);
+    //fetch user
+    const user = await cUser.findUserByEmail(email);
 
-  //if user doesn't exist with these credentials, respond with error
-  if (!user) {
-    next(new HttpError({ message: "invalid email or password", code: HttpStatus.CONFLICT }));
-    return;
-  }
+    //if user doesn't exist with these credentials, respond with error
+    if (!user) {
+      next(new HttpError({ message: "invalid email or password", code: HttpStatus.CONFLICT }));
+      return;
+    }
 
-  if (user && (await bcrypt.compare(password, user.password))) {
-    console.log(user);
-    console.log(`generating login token: ${user.id}`);
-    const authToken = generateToken(user.id);
-    res.cookie("authToken", authToken, {
-      secure: false,
-      httpOnly: true,
-      expires: dayjs().add(30, "days").toDate(),
-    });
-    res.status(HttpStatus.OK).send({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    });
-  } else {
-    next(new HttpError({ message: "invalid email or password", code: HttpStatus.FORBIDDEN }));
-    return;
+    if (user && (await bcrypt.compare(password, user.password))) {
+      console.log(user);
+      console.log(`generating login token: ${user.id}`);
+      const authToken = generateToken(user.id);
+      res.cookie("authToken", authToken, {
+        secure: false,
+        httpOnly: true,
+        expires: dayjs().add(30, "days").toDate(),
+      });
+      res.status(HttpStatus.OK).send({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      });
+    } else {
+      next(new HttpError({ message: "invalid email or password", code: HttpStatus.FORBIDDEN }));
+      return;
+    }
+  } catch (e) {
+    next(
+      new HttpError({ message: "Error logging in user", code: HttpStatus.INTERNAL_SERVER_ERROR })
+    );
   }
 }
 
@@ -139,20 +145,24 @@ async function logoutUser(req: Request, res: Response, next: NextFunction) {
  * @param res
  */
 async function getUserInfo(req: Request, res: Response, next: NextFunction) {
-  console.log("getting user info");
-  const userId = req.user;
-  if (!userId) {
-    next(new HttpError({ message: "User info not found", code: HttpStatus.NOT_FOUND }));
-  }
-  const user = await cUser.findUserById(userId);
-  if (user) {
-    res.status(HttpStatus.OK).send({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    });
-  } else {
-    next(new HttpError({ message: "User info not found", code: HttpStatus.NOT_FOUND }));
+  try {
+    console.log("getting user info");
+    const userId = req.user;
+    if (!userId) {
+      next(new HttpError({ message: "User info not found", code: HttpStatus.NOT_FOUND }));
+    }
+    const user = await cUser.findUserById(userId);
+    if (user) {
+      res.status(HttpStatus.OK).send({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      });
+    } else {
+      next(new HttpError({ message: "User info not found", code: HttpStatus.NOT_FOUND }));
+    }
+  } catch (e) {
+    next(new HttpError({ message: "Error locating user", code: HttpStatus.INTERNAL_SERVER_ERROR }));
   }
 }
 

@@ -4,7 +4,10 @@ import { getS3Config } from "./s3";
 import { type Document } from "shared/schema/document";
 import { cDocument } from "$/db/cDocument";
 
-async function validateUserIsOwner(document_key: string, currentUser: string): Promise<void> {
+export async function validateUserIsOwner(
+  document_key: string,
+  currentUser: string
+): Promise<void> {
   const userIsOwner = await cDocument.isUserOwner(document_key, currentUser);
   if (!userIsOwner) {
     throw new Error("Cannot access document for which you are not the owner");

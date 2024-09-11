@@ -222,10 +222,10 @@ body,
 .loading_container {
   position: relative;
   width: 100%;
-  height: 70%;
+  height: 100%;
   top: 0;
   left: 0;
-  z-index: 99;
+  z-index: 0;
   background: transparent;
   justify-content: center;
   align-items: center;
@@ -345,4 +345,11 @@ body,
   width: 3.5em;
   height: 3.5em;
   background-color: #0c0e0c;
+}
+
+.exceeded-documents-limit {
+  height: 20%;
+  width: 100%;
+  color: red;
+  text-align: center;
 }
