@@ -1,6 +1,6 @@
 import { Flex, Heading, Spinner, Text } from "@chakra-ui/react";
 import { DocumentTile } from "./DocumentTile";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { documentApi } from "../utils/documentUtils";
 import { useAtom } from "jotai";
 import { documentsAtom, selectedDocumentAtom } from "../state/documents";
