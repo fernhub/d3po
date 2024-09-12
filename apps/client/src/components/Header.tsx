@@ -32,7 +32,7 @@ function Header() {
         {mode === "chat" && <ChatModelSelector />}
       </GridItem>
       <GridItem colSpan={1} className="header-user-info">
-        {appState !== "loading" && <HeaderUserInfo />}
+        {appState !== "initializing" && <HeaderUserInfo />}
       </GridItem>
     </Grid>
   );
