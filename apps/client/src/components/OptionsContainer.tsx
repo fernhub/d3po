@@ -17,13 +17,12 @@ export function OptionsContainer() {
   const [, setSelectedDocument] = useAtom(selectedDocumentAtom);
   const [appState, setAppState] = useAtom(appStateAtom);
   const [mode, setMode] = useAtom(modeAtom);
-
   useEffect(() => {
     console.log("in useEffect");
     const getDocuments = async () => {
       const d: Document[] = await documentApi.getAll();
       setDocuments(d);
-      setAppState("waiting");
+      setAppState("loaded");
     };
     getDocuments();
   }, [setDocuments, setAppState]);
@@ -48,7 +47,7 @@ export function OptionsContainer() {
   }
   return (
     <>
-      {appState === "waiting" && (
+      {appState === "loaded" && (
         <Heading className="welcome-heading">
           {documents.length == 0
             ? "Upload a new document and begin interacting with the llm of your choice"
@@ -56,9 +55,9 @@ export function OptionsContainer() {
         </Heading>
       )}
       <Flex className="options_container" justifyContent={documents.length < 2 ? "center" : ""}>
-        {appState === "loading" && <Spinner />}
+        {appState === "loading" && <Spinner size="xl" color="white" />}
 
-        {mode === "options" && appState !== "loading" && (
+        {mode === "options" && appState === "loaded" && (
           <>
             <UploadTile />
             {renderDocuments()}

@@ -115,6 +115,7 @@ async function loginUser(req: Request, res: Response, next: NextFunction) {
       return;
     }
   } catch (e) {
+    console.log(e);
     next(
       new HttpError({ message: "Error logging in user", code: HttpStatus.INTERNAL_SERVER_ERROR })
     );

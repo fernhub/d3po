@@ -5,6 +5,7 @@ import { appStateAtom } from "../state/app";
 
 export default function UnauthLayout() {
   const [appState] = useAtom(appStateAtom);
+
   return (
     <Grid
       templateColumns="repeat(10, 1fr)"
