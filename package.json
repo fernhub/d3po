@@ -1,5 +1,5 @@
 {
-  "name": "com",
+  "name": "d3po",
   "private": true,
   "scripts": {
     "build": "turbo build",
