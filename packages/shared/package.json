@@ -5,11 +5,50 @@
   "main": "index.js",
   "types": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsc --watch",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "exports": {
+    "./schema/chat": {
+      "types": "./schema/chat.ts",
+      "default": "./dist/schema/chat.js"
+    },
+    "./schema/document": {
+      "types": "./schema/document.ts",
+      "default": "./dist/schema/subtract.js"
+    },
+    "./schema/model": {
+      "types": "./schema/model.ts",
+      "default": "./dist/schema/model.js"
+    },
+    "./schema/user": {
+      "types": "./schema/user.ts",
+      "default": "./dist/schema/user.js"
+    },
+    "./enums/document": {
+      "types": "./enums/document.ts",
+      "default": "./dist/enums/document.js"
+    },
+    "./enums/http-status.enums": {
+      "types": "./enums/http-status.enums.ts",
+      "default": "./dist/enums/http-status.enums.js"
+    },
+    "./enums/models": {
+      "types": "./enums/models.ts",
+      "default": "./dist/enums/models.js"
+    },
+    "./exceptions/HttpError": {
+      "types": "./exceptions/HttpError.ts",
+      "default": "./dist/exceptions/HttpError.js"
+    },
+    "./exceptions/SQLError": {
+      "types": "./exceptions/SQLError.ts",
+      "default": "./dist/exceptions/SQLError.js"
+    }
+  },
   "dependencies": {
     "typescript": "^5.5.4",
     "zod": "^3.23.8"
