@@ -1,7 +1,7 @@
 import { ArrowUpIcon } from "@chakra-ui/icons";
 import { Alert, AlertIcon, Box, Flex, Spinner, Textarea } from "@chakra-ui/react";
 import { type Document } from "shared/schema/document";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { Conversation } from "./Conversation";
 import { chatMessagesAtom } from "../state/chat";
