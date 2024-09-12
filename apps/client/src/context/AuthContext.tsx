@@ -28,7 +28,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
           setIsLoggedIn(true);
           setUser(user);
         } else {
-          setAppState("unathenticated");
+          setAppState("unauthenticated");
           console.log("no user found");
         }
       } catch (e) {
@@ -39,7 +39,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     fetchUserState();
-  }, []);
+  }, [setAppState]);
 
   async function login(email: string, password: string) {
     const res = await api.handleLogin(email, password);
