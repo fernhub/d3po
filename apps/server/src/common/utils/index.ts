@@ -1,3 +1,4 @@
+import { env } from "$/config";
 import jwt from "jsonwebtoken";
 
 interface JwtPayload {
@@ -24,7 +25,7 @@ export function validateAuthToken(authToken: string | null): string {
   }
   console.log("token exists, decoding");
   console.log(authToken);
-  const decoded = jwt.verify(authToken, process.env.JWT_SECRET!) as JwtPayload;
+  const decoded = jwt.verify(authToken, env.JWT_SECRET!) as JwtPayload;
   if (!decoded.userId) {
     console.log("userid not decoded from jwt");
     throw new Error("invalid jwt");

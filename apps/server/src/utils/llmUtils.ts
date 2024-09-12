@@ -1,5 +1,6 @@
 import { MODEL_SOURCE } from "shared/enums/models";
 import { Anthropic, HuggingFace, RAGApplication, SIMPLE_MODELS } from "@llm-tools/embedjs";
+import { env } from "$/config";
 
 export function getModelForRag(model_source: MODEL_SOURCE, model_key: string | number) {
   switch (model_source) {
@@ -29,11 +30,11 @@ function getByKey(model_key: any) {
 export function checkApiKeyPresent(model_source: MODEL_SOURCE) {
   switch (model_source) {
     case MODEL_SOURCE.Anthropic:
-      return process.env.ANTHROPIC_API_KEY;
+      return env.ANTHROPIC_API_KEY;
     case MODEL_SOURCE.OpenAI:
-      return process.env.OpenAI_API_KEY;
+      return env.OpenAI_API_KEY;
     case MODEL_SOURCE.Mistral:
-      return process.env.Mistral_API_KEY;
+      return env.Mistral_API_KEY;
     default:
       throw new Error("Model not recognized");
   }
