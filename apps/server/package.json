@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "prod": "node dist/index.js",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "dev": "POSTGRES_USER=zack POSTGRES_NAME=pdfhelper POSTGRES_URL=localhost POSTGRES_DATABASE=pdfhelper tsx src/index.ts --watch ./src --ext ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -48,6 +48,7 @@
     "@types/pg": "^8.11.6",
     "@types/uuid": "^10.0.0",
     "embedjs": "link:@types/@llm-tools/embedjs",
+    "tsc-alias": "^1.8.10",
     "typescript": "^5.2.2",
     "zod": "^3.23.8"
   }
