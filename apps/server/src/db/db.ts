@@ -9,7 +9,7 @@ export const db =
     ? new Pool({
         user: env.POSTGRES_USER,
         host: env.POSTGRES_URL,
-        password: env.POSTGRES_PASS,
+        password: env.POSTGRES_PASSWORD,
         port: parseInt(env.POSTGRES_PORT!, 10),
         database: env.POSTGRES_DATABASE,
       })
