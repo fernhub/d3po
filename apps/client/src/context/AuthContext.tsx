@@ -32,8 +32,11 @@ function AuthProvider({ children }: { children: ReactNode }) {
           console.log("no user found");
         }
       } catch (e) {
+        setAppState("unauthenticated");
         if (e instanceof HttpError) {
           console.log("no current user session");
+        } else {
+          console.log(e);
         }
       }
     }
