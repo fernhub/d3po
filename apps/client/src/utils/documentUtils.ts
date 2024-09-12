@@ -1,5 +1,5 @@
 import { DOCUMENT_STATUS } from "shared/enums/document";
-import { api } from ".";
+import { api, API_URL } from ".";
 import { type DocumentSignedUrl, type Document } from "shared/schema/document";
 
 export const documentApi = {
@@ -12,7 +12,7 @@ export const documentApi = {
     console.log("updated status in db");
   },
   getAll: async function (): Promise<Document[]> {
-    const res = await fetch("http://localhost:5001/documents/", {
+    const res = await fetch(`${API_URL}/documents/`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -23,7 +23,7 @@ export const documentApi = {
   },
   deleteFile: async function (s3_key: string) {
     console.log("deleting");
-    const res = await fetch("http://localhost:5001/documents/", {
+    const res = await fetch(`${API_URL}/documents/`, {
       method: "DELETE",
       credentials: "include",
       headers: {
@@ -46,7 +46,7 @@ async function getPresignedPutUrl(file: File): Promise<DocumentSignedUrl> {
     throw new Error("File too large, 5MB upload limit");
   }
   console.log("sending request");
-  const res = await fetch("http://localhost:5001/documents/beginUpload", {
+  const res = await fetch(`${API_URL}/documents/beginUpload`, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -95,7 +95,7 @@ async function markUploadComplete(s3_key: string) {
   if (s3_key === undefined || s3_key === null || s3_key === "") {
     throw new Error("File not defined, cannot upload");
   }
-  const res = await fetch("http://localhost:5001/documents/updateDocument", {
+  const res = await fetch(`${API_URL}/documents/updateDocument`, {
     method: "PUT",
     credentials: "include",
     headers: {
