@@ -4,8 +4,9 @@ import { env } from "../config";
 console.log(env);
 
 export const db = new Pool({
-  user: env.DB_USER,
-  host: env.DB_URL,
-  port: parseInt(env.DB_PORT, 10),
-  database: "pdfhelper",
+  user: env.POSTGRES_USER,
+  host: env.POSTGRES_URL,
+  password: env.POSTGRES_PASS,
+  port: 5432,
+  database: env.POSTGRES_DATABASE,
 });

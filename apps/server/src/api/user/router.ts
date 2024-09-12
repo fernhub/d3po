@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Router } from "express";
 import { userController } from "./controller";
 import { globalMiddlewares } from "../../common/middlewares";
 
@@ -8,4 +8,4 @@ router.route("/me").get(globalMiddlewares.authenticationHandler, userController.
 router.route("/login").post(userController.loginUser);
 router.route("/logout").post(globalMiddlewares.authenticationHandler, userController.logoutUser);
 
-export const userRouter = Object.assign(router, { ROOT: "/users" });
+export const userRouter: Router & { ROOT: string } = Object.assign(router, { ROOT: "/users" });
