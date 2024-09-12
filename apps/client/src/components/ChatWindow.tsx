@@ -1,7 +1,7 @@
 import { ArrowUpIcon } from "@chakra-ui/icons";
 import { Alert, AlertIcon, Box, Flex, Spinner, Textarea } from "@chakra-ui/react";
 import { type Document } from "shared/schema/document";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { Conversation } from "./Conversation";
 import { chatMessagesAtom } from "../state/chat";
@@ -141,8 +141,15 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
         <Textarea
           id="llm-chat-input-text"
           placeholder={getPlaceholder()}
+          onClick={() => console.log("text area clicked")}
           value={llmQuery}
           onChange={handleInputChange}
+          onKeyDown={(e) => {
+            console.log(e);
+            if (e.key === "Enter" && e.shiftKey === false) {
+              sendMessage();
+            }
+          }}
           disabled={appState !== "waiting"}
         />
         <Flex id="llm-chat-button-container">
