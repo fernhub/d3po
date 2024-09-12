@@ -33,7 +33,8 @@
     "tsx": "^4.17.0",
     "uuid": "^10.0.0",
     "vectorDb": "link:@llm-tools/embedjs/vectorDb",
-    "vectordb": "^0.9.0"
+    "vectordb": "^0.9.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
