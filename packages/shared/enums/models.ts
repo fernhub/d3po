@@ -1,4 +1,4 @@
-import { type Model } from "../schema/model";
+import { Model } from "../schema/model";
 
 type modelDefinitions = {
   [model: string]: Model[];
