@@ -10,6 +10,7 @@ import { useAtom } from "jotai";
 import { ChatMessage } from "shared/schema/chat";
 import { useAuth } from "../context/AuthContext";
 import { selectedModelAtom } from "../state/selectedModel";
+import { API_URL } from "../utils";
 
 type ChatWindowProps = {
   selectedDocument: Document | null;
@@ -31,7 +32,7 @@ export function ChatWindow({ selectedDocument }: ChatWindowProps) {
       model_source: selectedModel?.source,
       model_key: selectedModel?.key,
     };
-    const socket = io("http://localhost:5001", {
+    const socket = io(`${API_URL}`, {
       query: query,
       withCredentials: true,
     });

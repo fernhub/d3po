@@ -1,27 +1,11 @@
 import { HttpError } from "shared/exceptions/HttpError";
 import { type UserInfo } from "shared/schema/user";
 
-type QueryResponse = {
-  msg: string;
-};
+export const API_URL = process.env.API_URL;
 
 export const api = {
-  queryRag: async (queryString: string): Promise<QueryResponse> => {
-    const res = await fetch("http://localhost:5001/pdfs/query", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: queryString,
-      }),
-    });
-    return checkResponseAndThrowError(res);
-  },
   handleLogin: async (email: string, password: string): Promise<UserInfo> => {
-    const res = await fetch("http://localhost:5001/users/login", {
+    const res = await fetch(`${API_URL}/users/login`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -36,7 +20,7 @@ export const api = {
     return checkResponseAndThrowError(res);
   },
   handleSignup: async (name: string, email: string, password: string): Promise<UserInfo> => {
-    const res = await fetch("http://localhost:5001/users/signup", {
+    const res = await fetch(`${API_URL}/users/signup`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -52,13 +36,13 @@ export const api = {
     return checkResponseAndThrowError(res);
   },
   getCurrentUser: async (): Promise<UserInfo> => {
-    const res = await fetch("http://localhost:5001/users/me", {
+    const res = await fetch(`${API_URL}/users/me`, {
       credentials: "include",
     });
     return checkResponseAndThrowError(res);
   },
   handleLogout: async (): Promise<void> => {
-    const res = await fetch("http://localhost:5001/users/logout", {
+    const res = await fetch(`${API_URL}/users/logout`, {
       method: "POST",
       credentials: "include",
     });
