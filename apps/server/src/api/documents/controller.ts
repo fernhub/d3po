@@ -16,6 +16,7 @@ import { HttpStatus } from "shared/enums/http-status.enums";
 import { HttpError } from "shared/exceptions/HttpError";
 import { getS3Config } from "$/utils/s3";
 import { validateUserIsOwner } from "$/utils/documentUtils";
+import { env } from "$/config";
 
 /**
  * Create a hashed key, with the original file extension, for upload to s3 so that names are hidden and unique in bucket
@@ -44,7 +45,7 @@ async function beginUpload(req: Request, res: Response, next: NextFunction) {
 
     const s3 = new S3Client(getS3Config());
     const command = new PutObjectCommand({
-      Bucket: process.env.S3_BUCKET,
+      Bucket: env.S3_BUCKET,
       Key: key,
     });
 
@@ -122,7 +123,7 @@ async function deleteDocument(req: Request, res: Response, next: NextFunction) {
 
     const s3 = new S3Client(getS3Config());
     const command = new DeleteObjectCommand({
-      Bucket: process.env.S3_BUCKET,
+      Bucket: env.S3_BUCKET,
       Key: s3_key,
     });
 

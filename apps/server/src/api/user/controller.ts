@@ -7,11 +7,12 @@ import { HttpError } from "shared/exceptions/HttpError";
 import { HttpStatus } from "shared/enums/http-status.enums";
 import dayjs from "dayjs";
 import { error } from "console";
+import { env } from "$/config";
 
 // Generate JWT
 function generateToken(userId: string) {
   console.log(userId);
-  return jwt.sign({ userId }, process.env.JWT_SECRET!, { expiresIn: "30d" });
+  return jwt.sign({ userId }, env.JWT_SECRET!, { expiresIn: "30d" });
 }
 
 async function signupUser(req: Request, res: Response, next: NextFunction) {
