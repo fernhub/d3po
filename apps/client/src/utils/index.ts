@@ -1,7 +1,8 @@
 import { HttpError } from "shared/exceptions/HttpError";
 import { type UserInfo } from "shared/schema/user";
 
-export const API_URL = process.env.API_URL;
+export const API_URL = import.meta.env.DEV ? "http://localhost:5001" : "www.d3po.co";
+console.log(API_URL);
 
 export const api = {
   handleLogin: async (email: string, password: string): Promise<UserInfo> => {

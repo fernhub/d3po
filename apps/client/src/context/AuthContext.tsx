@@ -3,6 +3,8 @@ import { AuthContextData } from "./types";
 import { api } from "../utils";
 import { UserInfo } from "shared/schema/user";
 import { HttpError } from "shared/exceptions/HttpError";
+import { appStateAtom } from "../state/app";
+import { useAtom } from "jotai";
 
 const AuthContext = createContext<AuthContextData>({
   user: null,
@@ -15,6 +17,7 @@ const AuthContext = createContext<AuthContextData>({
 function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [user, setUser] = useState<UserInfo | null>(null);
+  const [, setAppState] = useAtom(appStateAtom);
 
   useEffect(() => {
     async function fetchUserState() {
@@ -25,6 +28,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
           setIsLoggedIn(true);
           setUser(user);
         } else {
+          setAppState("unathenticated");
           console.log("no user found");
         }
       } catch (e) {

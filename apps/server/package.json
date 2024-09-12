@@ -5,9 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "prod": "node dist/index.js",
+    "prod": "NODE_ENV=production node dist/index.js",
     "build": "tsc && tsc-alias",
-    "dev": "POSTGRES_USER=zack POSTGRES_NAME=pdfhelper POSTGRES_URL=localhost POSTGRES_DATABASE=pdfhelper tsx src/index.ts --watch ./src --ext ts",
+    "dev": "NODE_ENV=development POSTGRES_USER=zack POSTGRES_NAME=pdfhelper POSTGRES_URL=localhost POSTGRES_PORT=5432 POSTGRES_DATABASE=pdfhelper CLIENT_URL=http://localhost:5173 tsx src/index.ts --watch ./src --ext ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
