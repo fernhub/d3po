@@ -123,5 +123,5 @@ io.on("connection", async (socket) => {
 });
 
 httpServer.listen(env.PORT, () => {
-  console.log(`[server] Server running at ${env.BASE_URL}:${env.PORT}`);
+  console.log(`[server] Server running at ${env.API_URL}:${env.PORT}`);
 });

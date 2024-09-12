@@ -1,16 +1,20 @@
 {
   "$schema": "https://turbo.build/schema.json",
+
   "ui": "tui",
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "env": ["NODE_ENV", "API_URL", "PORT", "API_PORT"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": ["dist/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
     },
     "dev": {
+      "env": ["NODE_ENV", "API_URL", "PORT", "API_PORT"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "cache": false,
       "persistent": true
     }

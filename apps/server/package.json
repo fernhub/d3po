@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prod": "NODE_ENV=production && node dist/index.js",
+    "prod": "node dist/index.js",
     "build": "tsc",
-    "dev": "NODE_ENV=development POSTGRES_USER=zack POSTGRES_NAME=pdfhelper POSTGRES_URL=localhost POSTGRES_DATABASE=pdfhelper tsx src/index.ts --watch ./src --ext ts",
+    "dev": "POSTGRES_USER=zack POSTGRES_NAME=pdfhelper POSTGRES_URL=localhost POSTGRES_DATABASE=pdfhelper tsx src/index.ts --watch ./src --ext ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
