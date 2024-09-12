@@ -3,7 +3,8 @@
     "esm": true,
     "require": ["tsconfig-paths/register"],
     "compilerOptions": {
-      "moduleResolution": "nodenext"
+      "moduleResolution": "nodenext",
+      "esModuleInterop": true
     }
   },
   "tsc-alias": {

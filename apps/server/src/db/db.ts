@@ -1,5 +1,6 @@
-import { Pool } from "pg";
+import pg from "pg";
 import { env } from "../config";
+const { Pool } = pg;
 
 console.log(env);
 
