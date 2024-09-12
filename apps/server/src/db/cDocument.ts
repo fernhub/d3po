@@ -3,6 +3,7 @@ import { db } from "./db";
 import { QueryResult } from "pg";
 import { DOCUMENT_STATUS } from "shared/enums/document";
 import { SQLError } from "shared/exceptions/SQLError";
+import { env } from "$/config";
 
 export const cDocument = {
   /**
@@ -11,7 +12,7 @@ export const cDocument = {
    * @returns
    */
   createDocument: async function (document: UploadDocument): Promise<Document> {
-    const doc_limit = process.env.DOCUMENT_MAX_UPLOADS || 10;
+    const doc_limit = env.DOCUMENT_MAX_UPLOADS || 10;
     const queryResult: QueryResult = await db.query(
       `INSERT INTO 
       documents (user_id, name, s3_key, status) 

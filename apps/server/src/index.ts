@@ -1,6 +1,5 @@
 import express, { type Request, type Response, type Application } from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { pdfRouter } from "./api/pdf/router";
 import { userRouter } from "./api/user/router";
@@ -14,8 +13,7 @@ import { getUrlForS3Document } from "../src/utils/documentUtils";
 import { PdfLoader, RAGApplicationBuilder } from "@llm-tools/embedjs";
 import { getModelForRag, QUERY_TEMPLATE } from "./utils/llmUtils";
 import { HNSWDb } from "@llm-tools/embedjs/vectorDb/hnswlib";
-dotenv.config();
-const port = process.env.PORT;
+import { env } from "./config";
 
 const app: Application = express();
 
@@ -126,6 +124,6 @@ io.on("connection", async (socket) => {
   }
 });
 
-httpServer.listen(port, () => {
-  console.log(`[server] Server running at http://localhost:${port}`);
+httpServer.listen(env.PORT, () => {
+  console.log(`[server] Server running at http://localhost:${env.PORT}`);
 });
