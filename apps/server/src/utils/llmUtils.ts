@@ -1,5 +1,5 @@
 import { MODEL_SOURCE } from "shared/enums/models";
-import { Anthropic, Mistral, RAGApplication, SIMPLE_MODELS } from "@llm-tools/embedjs";
+import { Anthropic, Mistral, SIMPLE_MODELS } from "@llm-tools/embedjs";
 import { env } from "$/config";
 
 export function getModelForRag(model_source: MODEL_SOURCE, model_key: string | number) {
@@ -9,7 +9,7 @@ export function getModelForRag(model_source: MODEL_SOURCE, model_key: string | n
     case MODEL_SOURCE.OpenAI:
       return getByKey(model_key);
     case MODEL_SOURCE.Mistral:
-      return new Mistral({ accessToken: env.Mistral_API_KEY, modelName: model_key as string });
+      return new Mistral({ accessToken: env.MISTRAL_API_KEY!, modelName: model_key as string });
     default:
       throw new Error("Model not recognized");
   }
@@ -32,9 +32,9 @@ export function checkApiKeyPresent(model_source: MODEL_SOURCE) {
     case MODEL_SOURCE.Anthropic:
       return env.ANTHROPIC_API_KEY;
     case MODEL_SOURCE.OpenAI:
-      return env.OpenAI_API_KEY;
+      return env.OPENAI_API_KEY;
     case MODEL_SOURCE.Mistral:
-      return env.Mistral_API_KEY;
+      return env.MISTRAL_API_KEY;
     default:
       throw new Error("Model not recognized");
   }

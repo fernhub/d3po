@@ -1,7 +1,6 @@
 import express, { type Request, type Response, type Application } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { pdfRouter } from "./api/pdf/router";
 import { userRouter } from "./api/user/router";
 import { globalMiddlewares } from "./common/middlewares";
 import { documentRouter } from "./api/documents/router";
@@ -12,7 +11,7 @@ import { socketAuthenticationHandler } from "./common/middlewares/authentication
 import { getUrlForS3Document } from "../src/utils/documentUtils";
 import { PdfLoader, RAGApplicationBuilder } from "@llm-tools/embedjs";
 import { getModelForRag, QUERY_TEMPLATE } from "./utils/llmUtils";
-import { HNSWDb } from "@llm-tools/embedjs/vectorDb/hnswlib";
+import { LanceDb } from "@llm-tools/embedjs/vectorDb/lance";
 import { env } from "./config";
 
 const app: Application = express();
@@ -38,7 +37,6 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 //setup request endpoints
-app.use(pdfRouter.ROOT, pdfRouter);
 app.use(userRouter.ROOT, userRouter);
 app.use(documentRouter.ROOT, documentRouter);
 
@@ -73,7 +71,7 @@ io.on("connection", async (socket) => {
       .setQueryTemplate(QUERY_TEMPLATE)
       .setModel(getModelForRag(query.model_source, query.model_key))
       .addLoader(new PdfLoader({ filePathOrUrl: url }))
-      .setVectorDb(new HNSWDb())
+      .setVectorDb(new LanceDb({ path: "lance-", isTemp: true }))
       .build();
 
     console.log(`rag for ${query.model_source} ${query.model_key} ready`);

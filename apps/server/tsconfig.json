@@ -7,25 +7,28 @@
     }
   },
   "compilerOptions": {
-    "target": "esnext",
+    "target": "ESNext",
     "module": "ES2022",
     "outDir": "dist",
-    "rootDir": "src",
-    "strict": true,
-    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "allowJs": true,
+    "moduleResolution": "Bundler",
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
     "forceConsistentCasingInFileNames": true,
+    "noImplicitOverride": true,
+    "declaration": true,
+    "composite": true,
+    "sourceMap": true,
+    "declarationMap": true,
     "paths": {
       "$/*": ["./src/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    ".eslintrc.cjs",
-    "../../packages/shared/enums/http-status.enums.ts",
-    "../../packages/shared/enums/document.ts"
-  ],
-  "exclude": ["node_modules"],
+  "include": ["**/*.ts", ".eslintrc.cjs"],
+  "exclude": ["node_modules", "./dist/**/*"],
   "typeRoots": ["./node_module/@types", "./src/types"]
 }
