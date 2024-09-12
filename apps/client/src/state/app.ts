@@ -1,5 +1,5 @@
 import { atom } from "jotai";
 
-export const appStateAtom = atom<"unathenticated" | "loading" | "sending" | "waiting" | "error">(
-  "loading"
-);
+export const appStateAtom = atom<
+  "unathenticated" | "initializing" | "loading" | "sending" | "waiting" | "error"
+>("initializing");

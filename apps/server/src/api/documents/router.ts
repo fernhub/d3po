@@ -1,5 +1,5 @@
 import { globalMiddlewares } from "$/common/middlewares";
-import express from "express";
+import express, { Router } from "express";
 import { documentController } from "./controller";
 
 const router = express.Router();
@@ -17,4 +17,6 @@ router
   .route("/updateDocument")
   .put(globalMiddlewares.authenticationHandler, documentController.updateDocument);
 
-export const documentRouter = Object.assign(router, { ROOT: "/documents" });
+export const documentRouter: Router & { ROOT: string } = Object.assign(router, {
+  ROOT: "/documents",
+});

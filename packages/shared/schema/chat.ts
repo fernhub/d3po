@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { Model } from "./model";
 import { MODEL_SOURCE } from "../enums/models";
 
 export const socketConnectionQuerySchema = z.object({

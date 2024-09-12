@@ -8,16 +8,16 @@ if (result.error) {
 const { parsed: envs } = result;
 export const env = { ...envs };
 
-Object.assign(env, { NODE_ENV: process.env.NODE_ENV });
+Object.assign(env, {
+  NODE_ENV: process.env.NODE_ENV,
+  POSTGRES_USER: process.env.POSTGRES_USER,
+  POSTGRES_URL: process.env.POSTGRES_URL,
+  POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD,
+  POSTGRES_DATABASE: process.env.POSTGRES_DATABASE,
+});
 
-if (env.NODE_ENV == "development") {
-  Object.assign(env, {
-    DB_USER: process.env.DB_USER,
-    DB_URL: process.env.DB_URL,
-    DB_PORT: process.env.DB_PORT,
-    DB_NAME: process.env.DB_NAME,
-    BASE_URL: "localhost",
-  });
-}
+Object.assign(env, {
+  BASE_URL: env.NODE_ENV === "development" ? "localhost" : process.env.BASE_URL,
+});
 
 console.log(env);
