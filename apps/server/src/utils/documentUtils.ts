@@ -3,6 +3,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { getS3Config } from "./s3";
 import { type Document } from "shared/schema/document";
 import { cDocument } from "$/db/cDocument";
+import { env } from "$/config";
 
 export async function validateUserIsOwner(
   document_key: string,
@@ -22,10 +23,10 @@ export async function getUrlForS3Document(
     await validateUserIsOwner(document_key, currentUser);
     console.log("in get doc");
     const s3 = new S3Client(getS3Config());
-    console.log(process.env.S3_REGION);
+    console.log(env.S3_REGION);
     console.log(getS3Config());
     const command = new GetObjectCommand({
-      Bucket: process.env.S3_BUCKET,
+      Bucket: env.S3_BUCKET,
       Key: document_key,
     });
     console.log("getting url for doc");
