@@ -1,7 +1,10 @@
-import { Grid, GridItem, Heading } from "@chakra-ui/react";
+import { Grid, GridItem, Heading, Spinner } from "@chakra-ui/react";
 import Header from "./Header";
+import { useAtom } from "jotai";
+import { appStateAtom } from "../state/app";
 
 export default function UnauthLayout() {
+  const [appState] = useAtom(appStateAtom);
   return (
     <Grid
       templateColumns="repeat(10, 1fr)"
@@ -13,12 +16,16 @@ export default function UnauthLayout() {
       <GridItem rowSpan={2} colSpan={10} pl="2" pt="2" className="header">
         <Header />
       </GridItem>
-      <GridItem rowSpan={18} colSpan={10} backgroundColor="black">
-        <div className="demo">Placeholder</div>
-        <Heading className="home-heading">
-          Get help interpreting your documents, minus the headache of switching LLMs
-        </Heading>
-      </GridItem>
+      {appState == "loading" ? (
+        <Spinner size="xl" />
+      ) : (
+        <GridItem rowSpan={18} colSpan={10} backgroundColor="black">
+          <div className="demo">Placeholder</div>
+          <Heading className="home-heading">
+            Get help interpreting your documents, minus the headache of switching LLMs
+          </Heading>
+        </GridItem>
+      )}
     </Grid>
   );
 }

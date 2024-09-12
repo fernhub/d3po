@@ -6,11 +6,13 @@ import { useAtom } from "jotai";
 import { selectedDocumentAtom } from "../state/documents";
 import { selectedModelAtom } from "../state/selectedModel";
 import { ChatModelSelector } from "./ChatModelSelector";
+import { appStateAtom } from "../state/app";
 
 function Header() {
   const [mode, setMode] = useAtom(modeAtom);
   const [, setSelectedDocument] = useAtom(selectedDocumentAtom);
   const [, setSelectedModel] = useAtom(selectedModelAtom);
+  const [appState] = useAtom(appStateAtom);
   return (
     <Grid templateColumns="repeat(8, 1fr)" templateRows="1" className="app-header">
       <GridItem pl={20} colSpan={1} className="header-logo">
@@ -30,7 +32,7 @@ function Header() {
         {mode === "chat" && <ChatModelSelector />}
       </GridItem>
       <GridItem colSpan={1} className="header-user-info">
-        <HeaderUserInfo />
+        {appState !== "loading" && <HeaderUserInfo />}
       </GridItem>
     </Grid>
   );

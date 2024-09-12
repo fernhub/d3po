@@ -6,7 +6,7 @@ import { userRouter } from "./api/user/router";
 import { globalMiddlewares } from "./common/middlewares";
 import { documentRouter } from "./api/documents/router";
 import { createServer } from "http";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import { socketConnectionQuerySchema } from "shared/schema/chat";
 import { socketAuthenticationHandler } from "./common/middlewares/authenticationHandler";
 import { getUrlForS3Document } from "../src/utils/documentUtils";
@@ -20,7 +20,7 @@ const app: Application = express();
 //set up cors
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: `http://${env.BASE_URL}:${env.CLIENT_PORT}`,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
@@ -49,7 +49,7 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: `http://localhost:5173`,
+    origin: `http://${env.BASE_URL}:${env.CLIENT_PORT}`,
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -125,5 +125,5 @@ io.on("connection", async (socket) => {
 });
 
 httpServer.listen(env.PORT, () => {
-  console.log(`[server] Server running at http://localhost:${env.PORT}`);
+  console.log(`[server] Server running at ${env.BASE_URL}:${env.PORT}`);
 });
