@@ -11,7 +11,7 @@ import { socketAuthenticationHandler } from "./common/middlewares/authentication
 import { getUrlForS3Document } from "../src/utils/documentUtils";
 import { PdfLoader, RAGApplicationBuilder } from "@llm-tools/embedjs";
 import { getModelForRag, QUERY_TEMPLATE } from "./utils/llmUtils";
-import { HNSWDb } from "@llm-tools/embedjs/vectorDb/hnswlib";
+import { LanceDb } from "@llm-tools/embedjs/vectorDb/lance";
 import { env } from "./config";
 
 const app: Application = express();
@@ -71,7 +71,7 @@ io.on("connection", async (socket) => {
       .setQueryTemplate(QUERY_TEMPLATE)
       .setModel(getModelForRag(query.model_source, query.model_key))
       .addLoader(new PdfLoader({ filePathOrUrl: url }))
-      .setVectorDb(new HNSWDb())
+      .setVectorDb(new LanceDb({ path: "lance-", isTemp: true }))
       .build();
 
     console.log(`rag for ${query.model_source} ${query.model_key} ready`);

@@ -42,6 +42,3 @@ Thumbs.db
 
 #turbo
 .turbo
-
-# pnpm stuff
-pnpm-lock.yaml
