@@ -6,6 +6,10 @@
       "moduleResolution": "nodenext"
     }
   },
+  "tsc-alias": {
+    "resolveFullPaths": true,
+    "verbose": false
+  },
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
