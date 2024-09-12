@@ -19,7 +19,7 @@ const app: Application = express();
 //set up cors
 app.use(
   cors({
-    origin: `http://${env.BASE_URL}:${env.CLIENT_PORT}`,
+    origin: env.CLIENT_URL,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
@@ -47,7 +47,7 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: `http://${env.BASE_URL}:${env.CLIENT_PORT}`,
+    origin: env.CLIENT_URL,
     methods: ["GET", "POST"],
     credentials: true,
   },
