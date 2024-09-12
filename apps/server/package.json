@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prod": "NODE_ENV=production && node src/index.ts",
-    "dev": "NODE_ENV=development tsx src/index.ts --watch ./src --ext ts",
+    "dev": "NODE_ENV=development DB_USER=zack DB_URL=localhost DB_PORT=5432 tsx src/index.ts --watch ./src --ext ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
