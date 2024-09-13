@@ -36,6 +36,7 @@ export function FileDeleteModal({ isOpen, onClose, s3_key }: FileModalProps) {
           title: "Delete successful",
           description: "File was successfully deleted",
           position: "top",
+          duration: 2000,
           status: "success",
           isClosable: true,
         });

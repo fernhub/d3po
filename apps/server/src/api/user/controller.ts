@@ -104,9 +104,10 @@ async function loginUser(req: Request, res: Response, next: NextFunction) {
       console.log(user);
       console.log(`generating login token: ${user.id}`);
       const authToken = generateToken(user.id);
+      console.log(env.NODE_ENV == "production");
       res.cookie("authToken", authToken, {
         secure: env.NODE_ENV == "production",
-        sameSite: "none",
+        sameSite: env.NODE_ENV == "production" ? "none" : "lax",
         httpOnly: true,
         expires: dayjs().add(30, "days").toDate(),
       });
@@ -135,12 +136,7 @@ async function loginUser(req: Request, res: Response, next: NextFunction) {
 async function logoutUser(req: Request, res: Response, next: NextFunction) {
   //add any logout logic here
   try {
-    res.cookie("authToken", "", {
-      secure: env.NODE_ENV == "production",
-      sameSite: "none",
-      httpOnly: true,
-      expires: dayjs().subtract(1, "days").toDate(),
-    });
+    res.clearCookie("authToken", { httpOnly: true });
     console.log("cleared auth cookie");
     res.status(HttpStatus.OK).send({ msg: "user logged out successfully" });
   } catch (e) {
