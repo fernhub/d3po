@@ -102,7 +102,8 @@ async function loginUser(req: Request, res: Response, next: NextFunction) {
       console.log(`generating login token: ${user.id}`);
       const authToken = generateToken(user.id);
       res.cookie("authToken", authToken, {
-        secure: false,
+        secure: env.NODE_ENV == "production",
+        sameSite: "none",
         httpOnly: true,
         expires: dayjs().add(30, "days").toDate(),
       });
