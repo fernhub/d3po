@@ -27,6 +27,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
         if (user) {
           setIsLoggedIn(true);
           setUser(user);
+          setAppState("loading");
         } else {
           setAppState("unauthenticated");
           console.log("no user found");
