@@ -133,6 +133,8 @@ async function logoutUser(req: Request, res: Response, next: NextFunction) {
   //add any logout logic here
   try {
     res.cookie("authToken", "", {
+      secure: env.NODE_ENV == "production",
+      sameSite: "none",
       httpOnly: true,
       expires: dayjs().subtract(1, "days").toDate(),
     });
