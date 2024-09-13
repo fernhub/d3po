@@ -48,7 +48,7 @@ export function OptionsContainer() {
   return (
     <>
       {appState === "loaded" && (
-        <Heading className="welcome-heading">
+        <Heading>
           {documents.length == 0
             ? "Upload a new document and begin interacting with the llm of your choice"
             : "Select a document to begin interacting with the llm of your choice"}
