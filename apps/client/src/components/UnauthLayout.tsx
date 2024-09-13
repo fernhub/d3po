@@ -23,7 +23,7 @@ export default function UnauthLayout() {
         <GridItem rowSpan={18} colSpan={10} backgroundColor="black">
           <div className="demo">Placeholder</div>
           <Heading className="home-heading">
-            Get help interpreting your documents, minus the headache of switching LLMs
+            Get help interpreting your documents, without the headache of switching LLMs
           </Heading>
         </GridItem>
       )}
