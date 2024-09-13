@@ -18,7 +18,7 @@ export default function UnauthLayout() {
         <Header />
       </GridItem>
       {appState == "initializing" ? (
-        <Spinner size="xl" />
+        <Spinner size="xl" className="loading_container" color="white" />
       ) : (
         <GridItem rowSpan={18} colSpan={10} backgroundColor="black">
           <div className="demo">Placeholder</div>
