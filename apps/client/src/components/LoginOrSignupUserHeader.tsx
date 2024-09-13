@@ -10,6 +10,7 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
+  Tooltip,
   useDisclosure,
 } from "@chakra-ui/react";
 import LoginForm from "./LoginForm";
@@ -31,7 +32,10 @@ export default function LoginOrSignupUserHeader() {
           <Tabs isFitted variant="enclosed" className="login-or-signup-modal">
             <TabList mb="1em">
               <Tab>Login</Tab>
-              <Tab>Create Account</Tab>
+              <Tooltip
+                label={`As this is still in beta, new signups are temporarily unavailable. Contact fernandez.zack@icloud.com to request an account`}>
+                <Tab isDisabled>Create Account</Tab>
+              </Tooltip>
             </TabList>
             <ModalCloseButton />
             <TabPanels className="login-or-signup-modal">
