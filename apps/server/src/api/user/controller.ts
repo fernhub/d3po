@@ -6,7 +6,6 @@ import { cUser } from "$/db/cUser";
 import { HttpError } from "shared/exceptions/HttpError";
 import { HttpStatus } from "shared/enums/http-status.enums";
 import dayjs from "dayjs";
-import { error } from "console";
 import { env } from "$/config";
 
 // Generate JWT
@@ -16,60 +15,64 @@ function generateToken(userId: string) {
 }
 
 async function signupUser(req: Request, res: Response, next: NextFunction) {
-  try {
-    // parse body from request
-    const parse = newUserSchema.safeParse(req.body);
-    if (parse.error) {
-      next(parse.error);
-      return;
-    }
-    const data = parse.data;
+  next(
+    new HttpError({ message: "Signups temporarily disabled", code: HttpStatus.METHOD_NOT_ALLOWED })
+  );
+  return;
+  // try {
+  //   // parse body from request
+  //   const parse = newUserSchema.safeParse(req.body);
+  //   if (parse.error) {
+  //     next(parse.error);
+  //     return;
+  //   }
+  //   const data = parse.data;
 
-    console.log(data);
+  //   console.log(data);
 
-    const userExists = await cUser.findUserByEmail(data.email);
-    if (userExists) {
-      next(new HttpError({ message: "email already exists", code: HttpStatus.CONFLICT }));
-      return;
-    }
-    console.log("no");
+  //   const userExists = await cUser.findUserByEmail(data.email);
+  //   if (userExists) {
+  //     next(new HttpError({ message: "email already exists", code: HttpStatus.CONFLICT }));
+  //     return;
+  //   }
+  //   console.log("no");
 
-    // create hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(data.password, salt);
+  //   // create hash password
+  //   const salt = await bcrypt.genSalt(10);
+  //   const hashedPassword = await bcrypt.hash(data.password, salt);
 
-    console.log("pass hashed");
+  //   console.log("pass hashed");
 
-    //create user
-    console.log("creating row");
+  //   //create user
+  //   console.log("creating row");
 
-    const newUser: User = await cUser.createUser({
-      name: data.name,
-      email: data.email,
-      password: hashedPassword,
-    });
+  //   const newUser: User = await cUser.createUser({
+  //     name: data.name,
+  //     email: data.email,
+  //     password: hashedPassword,
+  //   });
 
-    //respond with jwt
-    const authToken = generateToken(newUser.id);
-    res.cookie("authToken", authToken, {
-      secure: env.NODE_ENV == "production",
-      sameSite: "none",
-      httpOnly: true,
-      expires: dayjs().add(30, "days").toDate(),
-    });
-    res.status(HttpStatus.CREATED).send({
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-    });
-  } catch (e) {
-    next(
-      new HttpError({
-        message: "Unable to create user",
-        code: HttpStatus.INTERNAL_SERVER_ERROR,
-      })
-    );
-  }
+  //   //respond with jwt
+  //   const authToken = generateToken(newUser.id);
+  //   res.cookie("authToken", authToken, {
+  //     secure: env.NODE_ENV == "production",
+  //     sameSite: "none",
+  //     httpOnly: true,
+  //     expires: dayjs().add(30, "days").toDate(),
+  //   });
+  //   res.status(HttpStatus.CREATED).send({
+  //     id: newUser.id,
+  //     name: newUser.name,
+  //     email: newUser.email,
+  //   });
+  // } catch (e) {
+  //   next(
+  //     new HttpError({
+  //       message: "Unable to create user",
+  //       code: HttpStatus.INTERNAL_SERVER_ERROR,
+  //     })
+  //   );
+  // }
 }
 
 async function loginUser(req: Request, res: Response, next: NextFunction) {
