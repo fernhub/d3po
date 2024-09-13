@@ -47,13 +47,15 @@ export function OptionsContainer() {
   }
   return (
     <>
-      {appState === "loaded" && (
-        <Heading>
-          {documents.length == 0
-            ? "Upload a new document and begin interacting with the llm of your choice"
-            : "Select a document to begin interacting with the llm of your choice"}
-        </Heading>
-      )}
+      <Flex className="welcome-heading">
+        {appState === "loaded" && (
+          <Heading>
+            {documents.length == 0
+              ? "Upload a new document and begin interacting with the llm of your choice"
+              : "Select a document to begin interacting with the llm of your choice"}
+          </Heading>
+        )}
+      </Flex>
       <Flex className="options_container" justifyContent={documents.length < 2 ? "center" : ""}>
         {appState === "loading" && <Spinner size="xl" color="white" />}
 
