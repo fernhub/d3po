@@ -11,8 +11,9 @@ import { socketAuthenticationHandler } from "./common/middlewares/authentication
 import { getUrlForS3Document } from "../src/utils/documentUtils";
 import { PdfLoader, RAGApplicationBuilder } from "@llm-tools/embedjs";
 import { getModelForRag, QUERY_TEMPLATE } from "./utils/llmUtils";
-import { LanceDb } from "@llm-tools/embedjs/vectorDb/lance";
 import { env } from "./config";
+import { MongoDb } from "@llm-tools/embedjs/vectorDb/mongodb";
+import path from "path";
 
 const app: Application = express();
 console.log("configuring cors for: ", env.CLIENT_URL);
@@ -68,11 +69,17 @@ io.on("connection", async (socket) => {
     const url = await getUrlForS3Document(query.document_key, query.user_id);
     console.log(url);
 
+    console.log(path.resolve("/db"));
     const ragApplication = await new RAGApplicationBuilder()
       .setQueryTemplate(QUERY_TEMPLATE)
       .setModel(getModelForRag(query.model_source, query.model_key))
       .addLoader(new PdfLoader({ filePathOrUrl: url }))
-      .setVectorDb(new LanceDb({ path: "lance-", isTemp: true }))
+      .setVectorDb(
+        new MongoDb({
+          connectionString:
+            "mongodb+srv://d3po:Q0MKX6h2vUUjWCwk@vector-store.wc8fe.mongodb.net/?retryWrites=true&w=majority&appName=vector-store",
+        })
+      )
       .build();
 
     console.log(`rag for ${query.model_source} ${query.model_key} ready`);
@@ -82,7 +89,6 @@ io.on("connection", async (socket) => {
       try {
         console.log("querying rag");
         const res = await ragApplication.query(query);
-        console.log(res.content);
         socket.emit("response", res.actor, res.content, res.timestamp);
       } catch (e) {
         if (e instanceof Error) {
@@ -105,12 +111,12 @@ io.on("connection", async (socket) => {
       console.log(embeddings);
       const embeddingsDeleted = await ragApplication.deleteAllEmbeddings(true);
       const embeddings2 = await ragApplication.getEmbeddingsCount();
-      console.log("rag embeddings deleted", embeddingsDeleted);
+      console.log("rag embeddings deleted: ", embeddingsDeleted);
       console.log("new embeddings count: ", embeddings2);
-      const allLoaders = await ragApplication.getLoaders();
-      console.log(allLoaders);
     });
   } catch (e) {
+    console.log("socket: error in socket");
+    console.log(e);
     if (e instanceof Error) {
       socket.emit("error", {
         msg: e.message,
