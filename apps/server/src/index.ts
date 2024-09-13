@@ -15,13 +15,14 @@ import { LanceDb } from "@llm-tools/embedjs/vectorDb/lance";
 import { env } from "./config";
 
 const app: Application = express();
-
+console.log("configuring cors for: ", env.CLIENT_URL);
 //set up cors
 app.use(
   cors({
     origin: env.CLIENT_URL,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
+    exposedHeaders: ["Set-cookie"],
   })
 );
 
