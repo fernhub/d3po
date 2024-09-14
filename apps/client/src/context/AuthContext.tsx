@@ -37,7 +37,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
         if (e instanceof HttpError) {
           console.log("no current user session");
         } else {
-          console.log(e);
+          //console.log(e);
         }
       }
     }
